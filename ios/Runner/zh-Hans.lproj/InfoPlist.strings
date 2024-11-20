@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Lulin Y on 2022/2/18.
+  
+*/
+
+"CFBundleDisplayName" = "博物馆迷";
+"NSUserTrackingUsageDescription" = "该标识符将用于向您投放个性化广告";
+"NSPhotoLibraryAddUsageDescription" = "该应用需要保存照片的权限用于保存这张图片";
+"NSPhotoLibraryUsageDescription" = "该应用需要保存照片的权限用于保存这张图片";
