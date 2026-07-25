@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
 import 'package:museumLovers/screens/search_detail_page.dart';
+import 'package:museumLovers/store/app_store.dart';
 import 'package:museumLovers/util/ads_manager.dart';
+import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
 
 import 'data_controller.dart';
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   late final Listenable combinedViewModel =
       Listenable.merge(<Listenable>[controller, singleColumn]);
 
-  static const double overScrollOffset = 100;
+  static const double loadMoreThreshold = 300;
 
   LoadingStatus _loadingStatus = LoadingStatus.initial;
 
@@ -42,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
-    WidgetsBinding.instance?.addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+    WidgetsBinding.instance.addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
   }
 
   @override
@@ -72,12 +74,13 @@ class _HomePageState extends State<HomePage> {
                     child: TextField(
                       style: const TextStyle(
                         fontSize: 15.0,
-                        color: Colors.grey,
+                        color: Colors.white,
                       ),
                       controller: _inputController,
-                      onChanged: (String value) {},
+                      textInputAction: TextInputAction.search,
                       onSubmitted: (String value) {
                         if (value.isNotEmpty == true) {
+                          AppStoreProvider.read(context).addRecentSearch(value);
                           Navigator.push<dynamic>(
                             context,
                             CupertinoPageRoute<dynamic>(
@@ -88,20 +91,40 @@ class _HomePageState extends State<HomePage> {
                           );
                         }
                       },
-                      decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 0),
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.fromLTRB(0, 14, 0, 0),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.search,
                             color: Colors.grey,
                           ),
-                          hintText: 'Search art work or author name'),
+                          suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: _inputController,
+                            builder: (BuildContext context, TextEditingValue value, _) {
+                              if (value.text.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return IconButton(
+                                tooltip: 'Clear',
+                                icon: const Icon(Icons.close, color: Colors.grey, size: 20),
+                                onPressed: _inputController.clear,
+                              );
+                            },
+                          ),
+                          hintText: 'Search artworks or artists',
+                          hintStyle: const TextStyle(color: Colors.grey)),
                     )),
                 pinned: true,
                 actions: null,
                 backgroundColor: Color(0xff141213),
+              ),
+              AnimatedBuilder(
+                animation: controller,
+                builder: (BuildContext context, _) => SliverToBoxAdapter(
+                  child: _DiscoverySection(arts: controller.data),
+                ),
               ),
               AnimatedBuilder(
                 animation: combinedViewModel,
@@ -158,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                 key: HomePage.overscrollBoxKey,
                 child: AnimatedBuilder(
                   animation: controller,
-                  child: Container(color: const Color(0xff141213), height: overScrollOffset / 3),
+                  child: Container(color: const Color(0xff141213), height: 32),
                   builder: (BuildContext context, Widget? child) {
                     if (_loadingStatus == LoadingStatus.initial ||
                         !(controller.isLoading || controller.hasError)) {
@@ -202,7 +225,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _onOverscroll() {
+  void _onLoadMoreWhenIdle() {
     if (_loadingStatus == LoadingStatus.idle) {
       _loadingStatus = LoadingStatus.loading;
       _onLoadMore();
@@ -210,25 +233,280 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
-    if (Axis.vertical == notification.metrics.axis) {
-      if (notification is ScrollUpdateNotification) {
-        if (notification.metrics.pixels > notification.metrics.maxScrollExtent &&
-            notification.metrics.pixels - notification.metrics.maxScrollExtent >=
-                overScrollOffset) {
-          _onOverscroll();
-        }
-        return true;
-      }
-
-      if (notification is OverscrollNotification) {
-        if (notification.overscroll > 0) {
-          _onOverscroll();
-        }
-        return true;
-      }
+    if (Axis.vertical == notification.metrics.axis &&
+        notification is ScrollUpdateNotification &&
+        notification.metrics.pixels >=
+            notification.metrics.maxScrollExtent - loadMoreThreshold) {
+      _onLoadMoreWhenIdle();
     }
     return false;
   }
 }
 
 enum LoadingStatus { idle, initial, loading }
+
+class _DiscoverySection extends StatelessWidget {
+  const _DiscoverySection({Key? key, required this.arts}) : super(key: key);
+
+  final List<Art> arts;
+
+  static const List<String> curatedTerms = <String>[
+    'Rembrandt van Rijn',
+    'Johannes Vermeer',
+    'Vincent van Gogh',
+    'Frans Hals',
+    'Jan Steen',
+    'Rachel Ruysch',
+    'Judith Leyster',
+    'Gerard van Honthorst',
+  ];
+
+  static int get _dayOfYear {
+    final DateTime now = DateTime.now();
+    return now.difference(DateTime(now.year)).inDays;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppStore store = context.appStore;
+    final List<String> recents = store.recentSearches;
+    final List<Art> recentlyViewed = store.recentlyViewed;
+    final Art? artworkOfDay = arts.isEmpty ? null : arts[_dayOfYear % arts.length];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (artworkOfDay != null) _ArtworkOfDayCard(art: artworkOfDay),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: curatedTerms.length,
+            separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
+            itemBuilder: (BuildContext context, int index) => _SearchChip(label: curatedTerms[index]),
+          ),
+        ),
+        if (recentlyViewed.isNotEmpty) ...<Widget>[
+          const _SectionLabel('Recently viewed'),
+          _RecentlyViewedRow(arts: recentlyViewed),
+        ],
+        if (recents.isNotEmpty) ...<Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
+            child: Row(
+              children: <Widget>[
+                Text('Recent searches', style: Theme.of(context).textTheme.titleSmall),
+                const Spacer(),
+                TextButton(
+                  onPressed: store.clearRecentSearches,
+                  child: const Text('Clear'),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: recents.length,
+              separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
+              itemBuilder: (BuildContext context, int index) =>
+                  _SearchChip(label: recents[index], icon: Icons.history),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text, {Key? key}) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+        child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+      );
+}
+
+class _ArtworkOfDayCard extends StatelessWidget {
+  const _ArtworkOfDayCard({Key? key, required this.art}) : super(key: key);
+
+  final Art art;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: () => DetailsPage.go(context, art: art),
+          child: SizedBox(
+            height: 180,
+            child: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                if (art.webImage?.url != null)
+                  CachedImage(url: artImageUrl(art.webImage!.url!, kGridImageSize)),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: <Color>[Colors.transparent, Colors.black87],
+                      stops: <double>[0.5, 1.0],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffD2FCAC),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'ARTWORK OF THE DAY',
+                          style: TextStyle(
+                            color: Color(0xff141213),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        art.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      Text(
+                        art.principalOrFirstMaker,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecentlyViewedRow extends StatelessWidget {
+  const _RecentlyViewedRow({Key? key, required this.arts}) : super(key: key);
+
+  final List<Art> arts;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return SizedBox(
+      height: 150,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: arts.length,
+        separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
+        itemBuilder: (BuildContext context, int index) {
+          final Art art = arts[index];
+          return SizedBox(
+            width: 110,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                onTap: () => DetailsPage.go(context, art: art),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    if (art.webImage?.url != null)
+                      CachedImage(url: artImageUrl(art.webImage!.url!, kGridImageSize)),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        color: Colors.black38,
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                        child: Text(
+                          art.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SearchChip extends StatelessWidget {
+  const _SearchChip({Key? key, required this.label, this.icon}) : super(key: key);
+
+  final String label;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white10,
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.push<dynamic>(
+            context,
+            CupertinoPageRoute<dynamic>(
+              builder: (_) => SearchDetailPage(searchTerm: label),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (icon != null) ...<Widget>[
+                Icon(icon, size: 14, color: Colors.white54),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: const TextStyle(color: Color(0xffD2FCAC), fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

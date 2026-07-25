@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:museumLovers/domain.dart';
+import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
 
 class ArtGridItem extends StatelessWidget {
@@ -26,12 +27,27 @@ class ArtGridItem extends StatelessWidget {
             children: <Widget>[
               if (art.webImage?.url != null)
                 Positioned.fill(
-                  child: CachedImage(
-                    url: art.webImage!.url!,
-                    builder: (ImageProvider<Object> provider) =>
-                        Ink.image(image: provider, fit: BoxFit.cover),
+                  child: Hero(
+                    tag: art.webImage!.url!,
+                    // A local Material is required here (rather than relying on
+                    // the ancestor above) because Hero flights temporarily
+                    // reparent this child into the Navigator's Overlay, which
+                    // has no Material ancestor of its own.
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: CachedImage(
+                        url: artImageUrl(art.webImage!.url!, kGridImageSize),
+                        builder: (ImageProvider<Object> provider) =>
+                            Ink.image(image: provider, fit: BoxFit.cover),
+                      ),
+                    ),
                   ),
                 ),
+              Positioned(
+                top: 6,
+                right: 6,
+                child: FavoriteButton(art: art),
+              ),
               // Positioned(
               //   top: 0,
               //   left: 0,
@@ -62,7 +78,7 @@ class ArtGridItem extends StatelessWidget {
                     art.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyText1?.copyWith(color: theme.colorScheme.onBackground),
+                    style: textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface),
                   ),
                 ),
               ),

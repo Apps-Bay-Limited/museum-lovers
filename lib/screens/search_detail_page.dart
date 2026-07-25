@@ -10,7 +10,10 @@ import 'details_page.dart';
 
 class SearchDetailPage extends StatefulWidget {
   final String searchTerm;
-  const SearchDetailPage({Key? key, required this.searchTerm}) : super(key: key);
+  final String? title;
+  final Future<List<Art>> Function({required int page, required String term})? source;
+
+  const SearchDetailPage({Key? key, required this.searchTerm, this.title, this.source}) : super(key: key);
 
   @visibleForTesting
   static const Key overscrollBoxKey = Key('overscroll-box');
@@ -25,14 +28,14 @@ class SearchDetailPage extends StatefulWidget {
 
 class _SearchDetailPageState extends State<SearchDetailPage> {
   late final PagedSearchDataController controller =
-      PagedSearchDataController(context.repository.fetchSearchAll);
+      PagedSearchDataController(widget.source ?? context.repository.fetchSearchAll);
 
   final ValueNotifier<bool> singleColumn = ValueNotifier<bool>(false);
 
   late final Listenable combinedViewModel =
       Listenable.merge(<Listenable>[controller, singleColumn]);
 
-  static const double overScrollOffset = 100;
+  static const double loadMoreThreshold = 300;
 
   LoadingStatus _loadingStatus = LoadingStatus.initial;
 
@@ -57,7 +60,7 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
           child: CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
-                title: Text(widget.searchTerm),
+                title: Text(widget.title ?? widget.searchTerm),
                 pinned: true,
                 actions: null,
                 backgroundColor: Color(0xff141213),
@@ -117,7 +120,7 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
                 key: SearchDetailPage.overscrollBoxKey,
                 child: AnimatedBuilder(
                   animation: controller,
-                  child: Container(color: const Color(0xff141213), height: overScrollOffset / 3),
+                  child: Container(color: const Color(0xff141213), height: 32),
                   builder: (BuildContext context, Widget? child) {
                     if (_loadingStatus == LoadingStatus.initial ||
                         !(controller.isLoading || controller.hasError)) {
@@ -162,7 +165,7 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
     }
   }
 
-  void _onOverscroll() {
+  void _onLoadMoreWhenIdle() {
     if (_loadingStatus == LoadingStatus.idle) {
       _loadingStatus = LoadingStatus.loading;
       _onLoadMore();
@@ -170,22 +173,11 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
-    if (Axis.vertical == notification.metrics.axis) {
-      if (notification is ScrollUpdateNotification) {
-        if (notification.metrics.pixels > notification.metrics.maxScrollExtent &&
-            notification.metrics.pixels - notification.metrics.maxScrollExtent >=
-                overScrollOffset) {
-          _onOverscroll();
-        }
-        return true;
-      }
-
-      if (notification is OverscrollNotification) {
-        if (notification.overscroll > 0) {
-          _onOverscroll();
-        }
-        return true;
-      }
+    if (Axis.vertical == notification.metrics.axis &&
+        notification is ScrollUpdateNotification &&
+        notification.metrics.pixels >=
+            notification.metrics.maxScrollExtent - loadMoreThreshold) {
+      _onLoadMoreWhenIdle();
     }
     return false;
   }

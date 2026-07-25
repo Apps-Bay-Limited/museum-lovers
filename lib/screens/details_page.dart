@@ -1,20 +1,14 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:museumLovers/constants.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
 import 'package:museumLovers/screens/search_detail_page.dart';
-import 'package:museumLovers/util/ads_manager.dart';
+import 'package:museumLovers/util/image_saver.dart';
+import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'data_controller.dart';
 import 'detail_full_page.dart';
@@ -48,6 +42,14 @@ class _DetailsPageState extends State<DetailsPage> {
   void initState() {
     controller.fetch();
     super.initState();
+    // Deferred to a post-frame callback: calling this synchronously here
+    // notifies AppStoreProvider's listeners while this page is still being
+    // mounted/built, which throws a "setState() called during build" error.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        AppStoreProvider.read(context).addRecentlyViewed(widget.art);
+      }
+    });
   }
 
   @override
@@ -69,7 +71,23 @@ class _DetailsPageState extends State<DetailsPage> {
                   width: 56,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(28),
-                      color: Colors.white24),
+                      color: Colors.black45),
+                  child: Center(
+                    child: FavoriteButton(
+                      art: widget.art,
+                      iconSize: 25,
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 12,
+                ),
+                Container(
+                  width: 56,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      color: Colors.black45),
                   child: InkWell(
                     // borderRadius: BorderRadius.circular(25),
                     // type: MaterialType.transparency,
@@ -101,80 +119,27 @@ class _DetailsPageState extends State<DetailsPage> {
                       width: 56,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(28),
-                          color: Colors.white24),
+                          color: Colors.black45),
                       child: InkWell(
                         // borderRadius: BorderRadius.circular(25),
                         // type: MaterialType.transparency,
                         child: IconButton(
+                            tooltip: 'Save image',
                             iconSize: 25,
                             onPressed: () async {
                               final String? url = widget.art.webImage?.url;
-                              if (url == null) {
+                              if (url == null || isDowloading) {
                                 return;
                               }
-                              final String urlTrue = url;
                               await HapticFeedback.lightImpact();
                               setState(() {
                                 isDowloading = true;
                               });
-                              final File file = await DefaultCacheManager()
-                                  .getSingleFile(urlTrue);
-
-                              setState(() {
-                                isDowloading = false;
-                              });
-
-                              final Uint8List pngBytes =
-                                  await file.readAsBytes();
-
-                              if (kDebugMode) {
-                                print(await Permission.photosAddOnly.status);
-                              }
-
-                              if (Platform.isIOS) {
-                                final IosDeviceInfo iosInfo =
-                                    await DeviceInfoPlugin().iosInfo;
-                                final String iOSVersion =
-                                    iosInfo.systemVersion!;
-                                print(iOSVersion);
-                                if (iOSVersion.compareTo("14.0") < 0) {
-                                  // iOS < 14.0
-
-                                  // await saveImageToPhotoApp(pngBytes, context);
-                                } else {
-                                  // iOS >= 14.0
-                                  if (await Permission.photosAddOnly
-                                      .request()
-                                      .isGranted) {
-                                    // await saveImageToPhotoApp(
-                                    //     pngBytes, context);
-                                  } else {
-                                    await showDialog<dynamic>(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            CupertinoAlertDialog(
-                                              title: const Text(
-                                                  'Photo Permission'),
-                                              content: const Text(
-                                                  'This App needs permission to save photos'),
-                                              actions: <Widget>[
-                                                CupertinoDialogAction(
-                                                  child: const Text('Cancel'),
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(),
-                                                ),
-                                                CupertinoDialogAction(
-                                                  child: const Text('Settings'),
-                                                  onPressed: () =>
-                                                      openAppSettings(),
-                                                ),
-                                              ],
-                                            ));
-                                  }
-                                }
-                              } else {
-                                // await saveImageToPhotoApp(pngBytes, context);
+                              await ImageSaver.save(url);
+                              if (mounted) {
+                                setState(() {
+                                  isDowloading = false;
+                                });
                               }
                             },
                             icon: const Icon(Icons.cloud_download_rounded)),
@@ -200,7 +165,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     width: 56,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(28),
-                        color: Colors.white24),
+                        color: Colors.black45),
                     child: ArtLinksButton(links: widget.art.links)),
                 const SizedBox(
                   width: 12,
@@ -225,7 +190,21 @@ class _DetailsPageState extends State<DetailsPage> {
                             );
                           }
                         },
-                        child: CachedImage(url: widget.art.webImage!.url!))
+                        child: Hero(
+                          tag: widget.art.webImage!.url!,
+                          child: CachedNetworkImage(
+                            key: Key(widget.art.webImage!.url!),
+                            imageUrl: widget.art.webImage!.url!,
+                            fit: BoxFit.cover,
+                            placeholder: (BuildContext context, String url) => Image(
+                              image: CachedNetworkImageProvider(
+                                  artImageUrl(widget.art.webImage!.url!, kGridImageSize)),
+                              fit: BoxFit.cover,
+                            ),
+                            errorWidget: (BuildContext context, String url, dynamic error) =>
+                                const Center(child: Icon(Icons.error)),
+                          ),
+                        ))
                     : null,
                 stretchModes: const <StretchMode>[StretchMode.zoomBackground],
                 collapseMode: CollapseMode.parallax,
@@ -276,8 +255,6 @@ class _DataView extends StatefulWidget {
 }
 
 class __DataViewState extends State<_DataView> {
-  bool _isAdLoaded = false;
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -286,7 +263,7 @@ class __DataViewState extends State<_DataView> {
     return SliverList(
       delegate: SliverChildListDelegate(<Widget>[
         AppSpacing.v16,
-        Text(widget.data.title, style: textTheme.headline5),
+        Text(widget.data.title, style: textTheme.headlineSmall),
         AppSpacing.v8,
         // if (data.physicalMedium != null) ...<Widget>[
         //   Text(data.physicalMedium!, style: textTheme.caption?.copyWith(fontSize: 14)),
@@ -304,7 +281,7 @@ class __DataViewState extends State<_DataView> {
                       type,
                       style: const TextStyle(color: Color(0xffD2FCAC)),
                     ),
-                    labelStyle: textTheme.bodyText1),
+                    labelStyle: textTheme.bodyLarge),
                 onTap: () {
                   Navigator.of(context).push<void>(MaterialPageRoute<void>(
                       builder: (BuildContext context) => SearchDetailPage(
@@ -322,7 +299,7 @@ class __DataViewState extends State<_DataView> {
         Row(children: <Widget>[
           const Icon(Icons.brush_rounded, size: 20),
           AppSpacing.h4,
-          Text(widget.data.principalMaker, style: textTheme.headline6),
+          Text(widget.data.principalMaker, style: textTheme.titleLarge),
         ]),
         AppSpacing.v10,
         Text(
@@ -330,10 +307,10 @@ class __DataViewState extends State<_DataView> {
               widget.data.plaqueDescriptionEnglish ??
               widget.data.description ??
               'N/A',
-          style: textTheme.bodyText1?.copyWith(height: 1.5),
+          style: textTheme.bodyLarge?.copyWith(height: 1.5),
         ),
         AppSpacing.v16,
-        Text(widget.data.scLabelLine, style: textTheme.caption),
+        Text(widget.data.scLabelLine, style: textTheme.bodySmall),
         if (widget.data.webImage?.url != null) ...<Widget>[
           AppSpacing.v4,
           AspectRatio(
@@ -358,7 +335,23 @@ class __DataViewState extends State<_DataView> {
           ),
           AppSpacing.v4,
         ],
-        ArtColorRow(colors: widget.data.normalizedColors),
+        ArtColorRow(
+          colors: widget.data.normalizedColors,
+          onColorTap: (ArtColor color) {
+            final String hex = '#${color.hex.replaceAll('#', '').trim().toUpperCase()}';
+            Navigator.push<dynamic>(
+              context,
+              CupertinoPageRoute<dynamic>(
+                builder: (BuildContext context) => SearchDetailPage(
+                  searchTerm: hex,
+                  title: 'Color $hex',
+                  source: ({required int page, required String term}) =>
+                      context.repository.fetchByColor(page: page, hex: term),
+                ),
+              ),
+            );
+          },
+        ),
         AppSpacing.v2,
         ArtMaterialRow(materials: widget.data.materials),
         AppSpacing.v16,
@@ -394,34 +387,34 @@ class __DataViewState extends State<_DataView> {
           const _SectionHeaderText('Production places'),
           AppSpacing.v8,
           Text(widget.data.productionPlaces.join(', '),
-              style: textTheme.bodyText2),
+              style: textTheme.bodyMedium),
           AppSpacing.v12,
         ],
         if (widget.data.techniques.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Techniques'),
           AppSpacing.v8,
-          Text(widget.data.techniques.join(', '), style: textTheme.bodyText2),
+          Text(widget.data.techniques.join(', '), style: textTheme.bodyMedium),
           AppSpacing.v12,
         ],
         if (widget.data.physicalProperties.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Physical properties'),
           AppSpacing.v8,
           Text(widget.data.physicalProperties.join(', '),
-              style: textTheme.bodyText2),
+              style: textTheme.bodyMedium),
           AppSpacing.v12,
         ],
         if (widget.data.historicalPersons.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Historical persons'),
           AppSpacing.v8,
           Text(widget.data.historicalPersons.join(', '),
-              style: textTheme.bodyText2),
+              style: textTheme.bodyMedium),
           AppSpacing.v12,
         ],
         if (widget.data.documentation.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Documentation'),
           AppSpacing.v8,
           Text('— ' + widget.data.documentation.join('\n— '),
-              style: textTheme.bodyText2?.copyWith(height: 1.25)),
+              style: textTheme.bodyMedium?.copyWith(height: 1.25)),
           AppSpacing.v12,
         ],
         AppSpacing.v24,
@@ -442,13 +435,13 @@ class _SectionHeaderText extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
       child: Text(
         data,
-        style: textTheme.headline6?.copyWith(
+        style: textTheme.titleLarge?.copyWith(
           letterSpacing: .85,
           height: 1.5,
           // decoration: TextDecoration.underline,
           // decorationStyle: TextDecorationStyle.double,
           fontStyle: FontStyle.italic,
-          decorationColor: textTheme.caption?.color,
+          decorationColor: textTheme.bodySmall?.color,
           color: Colors.white,
         ),
         key: Key(data),

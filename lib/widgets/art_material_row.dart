@@ -21,7 +21,7 @@ class ArtMaterialRow extends StatelessWidget {
                   material,
                   style: const TextStyle(color: Color(0xffD2FCAC)),
                 ),
-                labelStyle: textTheme.bodyText1),
+                labelStyle: textTheme.bodyLarge),
             onTap: () {
               Navigator.of(context).push<void>(MaterialPageRoute<void>(
                   builder: (BuildContext context) => SearchDetailPage(

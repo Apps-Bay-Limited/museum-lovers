@@ -6,4 +6,6 @@ abstract class RijksRepository {
   Future<List<Art>> fetchAll({required int page});
 
   Future<List<Art>> fetchSearchAll({required int page, required String term});
+
+  Future<List<Art>> fetchByColor({required String hex, required int page});
 }
