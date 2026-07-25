@@ -44,6 +44,38 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets — these files contain production API keys, AdMob IDs, keystore passwords
 lib/secrets.dart
 museum_lovers_game.sketch
 ios/Secret.xcconfig
+/android/secrets.properties
+/android/key.properties
+
+# Keystore files
+*.jks
+*.keystore
+
+# iOS Xcode user state
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+
+# Build output
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM
+android/.gradle/
+android/app/build/
+ios/build/
+ios/DerivedData/
+
+# OS
+Thumbs.db
+
+# Flutter
+flutter_*.png
+coverage/

@@ -1,0 +1,8 @@
+// Copy this file to ios/Secret.xcconfig and fill in your real production values.
+// Secret.xcconfig is listed in .gitignore — DO NOT commit it.
+//
+// Example:
+//   GADApplicationIdentifier = ca-app-pub-1234567890123456~1234567890
+//
+// Required for Release builds: the build will fail if Secret.xcconfig is missing.
+GADApplicationIdentifier = ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX

@@ -1,0 +1,4 @@
+// Production configuration — includes the untracked Secret.xcconfig
+// If this file is missing, Xcode will fail to resolve $(GADApplicationIdentifier)
+// and the build will stop with a clear error.
+#include "../Secret.xcconfig"
