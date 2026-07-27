@@ -9,3 +9,4 @@
 "CFBundleDisplayName" = "Museum Lovers";
 "NSUserTrackingUsageDescription" = "This identifier is used to show you more relevant ads, for example art exhibits, gallery events, or museum-related apps similar to artworks you've viewed in Museum Lovers.";
 "NSPhotoLibraryAddUsageDescription" = "Museum Lovers saves artwork images to your Photos library, for example when you tap the download button on a painting's detail page to keep a copy.";
+"NSPhotoLibraryUsageDescription" = "Museum Lovers accesses your Photos library so it can save artwork images you download, for example when you tap the download button on a painting's detail page to keep a copy.";

@@ -40,6 +40,8 @@
 	</dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Museum Lovers saves artwork images to your Photos library, for example when you tap the download button on a painting's detail page to keep a copy.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Museum Lovers accesses your Photos library so it can save artwork images you download, for example when you tap the download button on a painting's detail page to keep a copy.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This identifier is used to show you more relevant ads, for example art exhibits, gallery events, or museum-related apps similar to artworks you've viewed in Museum Lovers.</string>
 	<key>SKAdNetworkItems</key>

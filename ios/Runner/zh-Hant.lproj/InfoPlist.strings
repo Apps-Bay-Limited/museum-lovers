@@ -9,3 +9,4 @@
 "CFBundleDisplayName" = "博物館迷";
 "NSUserTrackingUsageDescription" = "此識別碼用於向您展示更相關的廣告，例如與您在「博物館迷」中瀏覽過的作品相似的藝術展覽、畫廊活動或博物館相關應用程式。";
 "NSPhotoLibraryAddUsageDescription" = "博物館迷會將藝術品圖片保存到您的照片庫，例如當您在作品詳情頁點擊下載按鈕以保留一份圖片時。";
+"NSPhotoLibraryUsageDescription" = "博物館迷需要存取您的照片庫以保存您下載的藝術品圖片，例如當您在作品詳情頁點擊下載按鈕以保留一份圖片時。";
