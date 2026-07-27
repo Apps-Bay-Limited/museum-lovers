@@ -60,19 +60,18 @@ class HttpRijksRepository implements RijksRepository {
   // number pages starting at 1, not 0.
   static const int _firstPage = 1;
 
-  /// Query backing the Explore feed. Restricted to paintings because the
-  /// collection is dominated by coins, medals and prints, and the search
-  /// returns objects in object-id order — browsing unfiltered surfaces long
-  /// runs of near-identical numismatic photographs.
-  static const Map<String, String> browseQuery = <String, String>{
-    'type': 'painting',
-    'imageAvailable': 'true',
-  };
+  /// The museum's own curated "Top 1000" masterpieces set, used for the
+  /// Masterpieces browse category and to source Artwork of the Day.
+  static const String topThousandSetId = 'https://id.rijksmuseum.nl/260214';
 
   @override
-  Future<List<Art>> fetchAll({required int page}) async {
-    final String url = _buildSearchUrl(browseQuery);
-    final _SearchCursor cursor = _cursorFor('browse', url);
+  Future<List<Art>> fetchAll({required int page, String type = 'painting', bool masterpieces = false}) async {
+    final Map<String, String> query = masterpieces
+        ? <String, String>{'memberOfSetId': topThousandSetId, 'imageAvailable': 'true'}
+        : <String, String>{'type': type, 'imageAvailable': 'true'};
+    final String cursorKey = masterpieces ? 'browse:masterpieces' : 'browse:$type';
+    final String url = _buildSearchUrl(query);
+    final _SearchCursor cursor = _cursorFor(cursorKey, url);
     if (page <= _firstPage) {
       _restart(cursor, url);
     }
@@ -81,14 +80,27 @@ class HttpRijksRepository implements RijksRepository {
 
   @override
   Future<List<Art>> fetchSearchAll({required String term, required int page}) async {
-    // No free-text search: match on creator (artist), falling back to title.
     final _SearchCursor cursor = _cursorFor('search:$term', _buildSearchUrl(<String, String>{'creator': term}));
     if (page <= _firstPage) {
-      final int creatorHits = await _totalFor(<String, String>{'creator': term});
-      final String mode = creatorHits > 0 ? 'creator' : 'title';
+      final String mode = await _pickSearchMode(term);
       _restart(cursor, _buildSearchUrl(<String, String>{mode: term}));
     }
     return _resolvePage(cursor, page);
+  }
+
+  /// Tries [term] as a creator, then a title, then a free-text description
+  /// match, and commits to the first that returns results. Falls back to
+  /// `description` (a true free-text search) so unmatched terms still query
+  /// something reasonable rather than silently returning nothing.
+  static const List<String> _searchModes = <String>['creator', 'title', 'description'];
+
+  Future<String> _pickSearchMode(String term) async {
+    for (final String mode in _searchModes) {
+      if (await _totalFor(<String, String>{mode: term}) > 0) {
+        return mode;
+      }
+    }
+    return _searchModes.last;
   }
 
   @override
@@ -179,7 +191,7 @@ class HttpRijksRepository implements RijksRepository {
         objectNumber: localId,
         title: _title(obj),
         longTitle: _title(obj),
-        principalOrFirstMaker: _maker(obj),
+        principalOrFirstMaker: _makerName(obj),
         hasImage: image != null,
         showImage: image != null,
         webImage: image,
@@ -230,7 +242,8 @@ class HttpRijksRepository implements RijksRepository {
   Future<ArtDetail> _artDetailFromObject(String localId, Map<String, dynamic> obj) async {
     final String? imageUrl = await _resolveImage(localId, obj);
     final ArtImage? image = imageUrl == null ? null : _imageFrom(imageUrl, obj);
-    final String maker = _maker(obj);
+    final List<_MakerRef> makerRefs = _makerRefs(obj);
+    final String maker = makerRefs.isEmpty ? 'Anonymous' : makerRefs.map((_MakerRef r) => r.name).join(', ');
     final String title = _title(obj);
     final List<String> materials = _materials(obj);
     final String? medium = _referredText(obj, 'http://vocab.getty.edu/aat/300435429');
@@ -252,15 +265,27 @@ class HttpRijksRepository implements RijksRepository {
       objectCollection: const <String>[],
       principalMaker: maker,
       principalOrFirstMaker: maker,
-      principalMakers: <ArtMaker>[
-        ArtMaker(
-          name: maker,
-          unFixedName: maker,
-          occupation: const <String>[],
-          roles: const <String>[],
-          labelDesc: maker,
-        ),
-      ],
+      principalMakers: makerRefs.isEmpty
+          ? <ArtMaker>[
+              const ArtMaker(
+                name: 'Anonymous',
+                unFixedName: 'Anonymous',
+                occupation: <String>[],
+                roles: <String>[],
+                labelDesc: 'Anonymous',
+              ),
+            ]
+          : <ArtMaker>[
+              for (final _MakerRef ref in makerRefs)
+                ArtMaker(
+                  id: ref.id,
+                  name: ref.name,
+                  unFixedName: ref.name,
+                  occupation: const <String>[],
+                  roles: const <String>[],
+                  labelDesc: ref.name,
+                ),
+            ],
       materials: materials,
       productionPlaces: const <String>[],
       techniques: _techniques(obj),
@@ -285,7 +310,123 @@ class HttpRijksRepository implements RijksRepository {
         yearEarly: 0,
         yearLate: 0,
       ),
+      plaqueDescriptionEnglish: _wallText(obj),
+      inscriptions: _inscriptions(obj),
+      galleryLocation: _galleryLocation(obj),
+      onDisplay: obj['current_location'] != null,
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Object → ArtMaker (artist page)
+  // ---------------------------------------------------------------------------
+
+  final Map<String, ArtMaker> _artistCache = <String, ArtMaker>{};
+
+  @override
+  Future<ArtMaker> fetchArtist(String id) async {
+    final String localId = _localId(id);
+    final ArtMaker? cached = _artistCache[localId];
+    if (cached != null) {
+      return cached;
+    }
+    final Map<String, dynamic> person = await _getObject(localId);
+    final ArtMaker artist = await _artistFromPerson(localId, person);
+    return _artistCache[localId] = artist;
+  }
+
+  Future<ArtMaker> _artistFromPerson(String localId, Map<String, dynamic> person) async {
+    final String name = _title(person);
+    final List<String> occupation = await _occupations(person);
+    final String? placeOfBirth = await _eventPlace(person['born']);
+    final String? placeOfDeath = await _eventPlace(person['died']);
+    return ArtMaker(
+      id: localId,
+      name: name,
+      unFixedName: name,
+      placeOfBirth: placeOfBirth,
+      dateOfBirth: _eventDate(person['born']),
+      placeOfDeath: placeOfDeath,
+      dateOfDeath: _eventDate(person['died']),
+      occupation: occupation,
+      roles: const <String>[],
+      biography: _referredText(person, _aatBiography),
+      labelDesc: name,
+    );
+  }
+
+  /// Parses birth/death dates, which may be a full `YYYY-MM-DD` or a
+  /// partial `YYYY-MM`/`YYYY` (day/month default to 1 when missing).
+  static DateTime? _parsePartialDate(String value) {
+    final List<String> parts = value.split('-');
+    final int? year = int.tryParse(parts[0]);
+    if (year == null) {
+      return null;
+    }
+    final int month = parts.length > 1 ? int.tryParse(parts[1]) ?? 1 : 1;
+    final int day = parts.length > 2 ? int.tryParse(parts[2]) ?? 1 : 1;
+    return DateTime(year, month, day);
+  }
+
+  DateTime? _eventDate(dynamic event) {
+    if (event is! Map<String, dynamic>) {
+      return null;
+    }
+    final Object? timespan = event['timespan'];
+    if (timespan is! Map<String, dynamic>) {
+      return null;
+    }
+    for (final dynamic n in (timespan['identified_by'] as List<dynamic>?) ?? const <dynamic>[]) {
+      final String? content = (n as Map<String, dynamic>)['content'] as String?;
+      if (content != null && content.isNotEmpty) {
+        return _parsePartialDate(content);
+      }
+    }
+    return null;
+  }
+
+  Future<String?> _eventPlace(dynamic event) async {
+    if (event is! Map<String, dynamic>) {
+      return null;
+    }
+    final String? placeId = _firstId(event['took_place_at']);
+    if (placeId == null) {
+      return null;
+    }
+    try {
+      return _title(await _getObject(_localId(placeId)));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Resolves up to 3 of the person's professional activities to human
+  /// readable occupation labels. Capped to bound the number of extra
+  /// requests an artist-page fetch makes.
+  Future<List<String>> _occupations(Map<String, dynamic> person) async {
+    final List<String> activityIds = <String>{
+      for (final dynamic a in (person['carried_out'] as List<dynamic>?) ?? const <dynamic>[])
+        if (_firstId((a as Map<String, dynamic>)['classified_as']) case final String id) id,
+    }.take(3).toList();
+    final List<Map<String, dynamic>?> activities = await Future.wait(
+      activityIds.map((String id) async {
+        try {
+          return await _getObject(_localId(id));
+        } catch (_) {
+          return null;
+        }
+      }),
+    );
+    final List<String> labels = <String>[];
+    for (final Map<String, dynamic>? activity in activities) {
+      // Resolved Type objects carry their label under identified_by (like a
+      // title), not notation (which is only used for values embedded inline).
+      final String? label = activity == null ? null : _title(activity);
+      if (label != null && label != 'Untitled' && !labels.contains(label)) {
+        labels.add(label);
+      }
+    }
+    return labels;
   }
 
   // ---------------------------------------------------------------------------
@@ -332,14 +473,18 @@ class HttpRijksRepository implements RijksRepository {
     return fallback ?? 'Untitled';
   }
 
-  String _maker(Map<String, dynamic> obj) {
-    final List<String> makers = <String>[];
+  /// Collects the distinct Person/Group nodes credited in `produced_by`,
+  /// each with its Rijksmuseum Person id when present (enabling navigation
+  /// to a full artist page).
+  List<_MakerRef> _makerRefs(Map<String, dynamic> obj) {
+    final List<_MakerRef> makers = <_MakerRef>[];
     void collect(dynamic node) {
       if (node is Map<String, dynamic>) {
         if (node['type'] == 'Person' || node['type'] == 'Group') {
           final String? name = _notation(node['notation']) ?? node['_label'] as String?;
-          if (name != null && name.isNotEmpty && !makers.contains(name)) {
-            makers.add(name);
+          final String? id = node['id'] as String?;
+          if (name != null && name.isNotEmpty && !makers.any((_MakerRef m) => m.name == name)) {
+            makers.add(_MakerRef(name: name, id: id == null ? null : _localId(id)));
           }
         }
         for (final dynamic v in node.values) {
@@ -353,7 +498,12 @@ class HttpRijksRepository implements RijksRepository {
     }
 
     collect(obj['produced_by']);
-    return makers.isEmpty ? 'Anonymous' : makers.join(', ');
+    return makers;
+  }
+
+  String _makerName(Map<String, dynamic> obj) {
+    final List<_MakerRef> refs = _makerRefs(obj);
+    return refs.isEmpty ? 'Anonymous' : refs.map((_MakerRef r) => r.name).join(', ');
   }
 
   List<String> _materials(Map<String, dynamic> obj) => <String>[
@@ -439,6 +589,91 @@ class HttpRijksRepository implements RijksRepository {
     return fallback;
   }
 
+  // Getty AAT ids used for detail-page fields not covered by _referredText
+  // (which only looks at top-level referred_to_by entries).
+  static const String _aatWallText = 'http://vocab.getty.edu/aat/300048722';
+  static const String _aatInscription = 'http://vocab.getty.edu/aat/300435414';
+  static const String _aatBiography = 'http://vocab.getty.edu/aat/300435422';
+
+  /// The curator's wall-label text lives under `subject_of[].part[]`, not the
+  /// top-level `referred_to_by` that [_referredText] searches — the English
+  /// and Dutch versions are separate `subject_of` entries, so the language is
+  /// read from the parent rather than the part itself.
+  String? _wallText(Map<String, dynamic> obj) {
+    String? fallback;
+    for (final dynamic s in (obj['subject_of'] as List<dynamic>?) ?? const <dynamic>[]) {
+      final Map<String, dynamic> subject = s as Map<String, dynamic>;
+      final bool isEnglish = _hasLanguage(subject['language'], _aatEnglish);
+      for (final dynamic p in (subject['part'] as List<dynamic>?) ?? const <dynamic>[]) {
+        final Map<String, dynamic> part = p as Map<String, dynamic>;
+        final bool matches = ((part['classified_as'] as List<dynamic>?) ?? const <dynamic>[])
+            .any((dynamic c) => (c as Map<String, dynamic>)['id'] == _aatWallText);
+        if (!matches) {
+          continue;
+        }
+        final String? content = part['content'] as String?;
+        if (content == null || content.isEmpty) {
+          continue;
+        }
+        if (isEnglish) {
+          return content;
+        }
+        fallback ??= content;
+      }
+    }
+    return fallback;
+  }
+
+  /// Signatures and inscriptions, e.g. dated signatures on the work itself.
+  /// Each fact is usually duplicated in Dutch and English; English is
+  /// preferred, falling back to whatever language is available.
+  List<String> _inscriptions(Map<String, dynamic> obj) {
+    final List<String> english = <String>[];
+    final List<String> any = <String>[];
+    for (final dynamic r in (obj['referred_to_by'] as List<dynamic>?) ?? const <dynamic>[]) {
+      final Map<String, dynamic> entry = r as Map<String, dynamic>;
+      final bool matches = ((entry['classified_as'] as List<dynamic>?) ?? const <dynamic>[])
+          .any((dynamic c) => (c as Map<String, dynamic>)['id'] == _aatInscription);
+      if (!matches) {
+        continue;
+      }
+      final String? content = entry['content'] as String?;
+      if (content == null || content.isEmpty) {
+        continue;
+      }
+      any.add(content);
+      if (_hasLanguage(entry['language'], _aatEnglish)) {
+        english.add(content);
+      }
+    }
+    return english.isNotEmpty ? english : any;
+  }
+
+  /// Human-readable "building · gallery" string from `current_location`,
+  /// e.g. "Main building · Gallery of Honour". Null when the object has no
+  /// current location (typically meaning it's in storage, not on display).
+  String? _galleryLocation(Map<String, dynamic> obj) {
+    final Object? location = obj['current_location'];
+    if (location is! Map<String, dynamic>) {
+      return null;
+    }
+    for (final dynamic n in (location['identified_by'] as List<dynamic>?) ?? const <dynamic>[]) {
+      final Map<String, dynamic> entry = n as Map<String, dynamic>;
+      if (entry['type'] != 'Name' || !_hasLanguage(entry['language'], _aatEnglish)) {
+        continue;
+      }
+      final List<String> parts = <String>[
+        for (final dynamic p in (entry['part'] as List<dynamic>?) ?? const <dynamic>[])
+          if ((p as Map<String, dynamic>)['content'] is String && (p['content'] as String).isNotEmpty)
+            p['content'] as String,
+      ];
+      if (parts.isNotEmpty) {
+        return parts.join(' · ');
+      }
+    }
+    return null;
+  }
+
   String? _webPage(Map<String, dynamic> obj) {
     for (final dynamic s in (obj['subject_of'] as List<dynamic>?) ?? const <dynamic>[]) {
       for (final dynamic d in ((s as Map<String, dynamic>)['digitally_carried_by'] as List<dynamic>?) ??
@@ -514,6 +749,14 @@ class _SearchCursor {
   final List<String> ids = <String>[];
   String? nextUrl;
   bool exhausted = false;
+}
+
+/// A credited Person/Group, with its Rijksmuseum Person id when known.
+class _MakerRef {
+  const _MakerRef({required this.name, this.id});
+
+  final String name;
+  final String? id;
 }
 
 class DummyRijksRepository implements RijksRepository {
@@ -594,11 +837,14 @@ class DummyRijksRepository implements RijksRepository {
         width: imageSize,
         height: imageSize,
       ),
+      inscriptions: <String>['Lorem Ipsum'],
+      galleryLocation: 'Main building · Gallery of Honour',
+      onDisplay: true,
     );
   }
 
   @override
-  Future<List<Art>> fetchAll({required int page}) async {
+  Future<List<Art>> fetchAll({required int page, String type = 'painting', bool masterpieces = false}) async {
     final List<String> colors = <String>['4DB6AC', '26A69A', '009688', '00897B', '00695C'];
     return List<Art>.generate(20, (int index) {
       const int imageSize = 150;
@@ -628,4 +874,10 @@ class DummyRijksRepository implements RijksRepository {
 
   @override
   Future<List<Art>> fetchByColor({required String hex, required int page}) => fetchAll(page: page);
+
+  @override
+  Future<ArtMaker> fetchArtist(String id) {
+    // TODO: implement fetchArtist
+    throw UnimplementedError();
+  }
 }

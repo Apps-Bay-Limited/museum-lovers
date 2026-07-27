@@ -22,3 +22,24 @@ String artImageUrl(String url, int size) {
   }
   return url;
 }
+
+/// Requests a cropped detail of [url] instead of the full image, using the
+/// IIIF region parameter (`pct:x,y,w,h`, all percentages of the full image).
+/// Used by the art-detail quiz to show a zoomed-in fragment. Falls back to
+/// the unmodified [url] when it isn't a recognized IIIF url.
+String artImageRegionUrl(
+  String url, {
+  required double xPct,
+  required double yPct,
+  required double wPct,
+  required double hPct,
+  int size = 600,
+}) {
+  final RegExp iiifRegionAndSize = RegExp(r'/full/[^/]+/');
+  if (!iiifRegionAndSize.hasMatch(url)) {
+    return url;
+  }
+  final String region =
+      'pct:${xPct.toStringAsFixed(1)},${yPct.toStringAsFixed(1)},${wPct.toStringAsFixed(1)},${hPct.toStringAsFixed(1)}';
+  return url.replaceFirst(iiifRegionAndSize, '/$region/$size,/');
+}

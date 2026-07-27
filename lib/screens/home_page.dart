@@ -10,6 +10,26 @@ import 'package:museumLovers/widgets.dart';
 
 import 'data_controller.dart';
 import 'details_page.dart';
+import 'quiz_page.dart';
+
+/// A browsable Explore category: either a `type=` filter or the curated
+/// Top 1000 masterpieces set.
+class _BrowseCategory {
+  const _BrowseCategory({required this.label, this.type, this.masterpieces = false});
+
+  final String label;
+  final String? type;
+  final bool masterpieces;
+}
+
+const List<_BrowseCategory> _categories = <_BrowseCategory>[
+  _BrowseCategory(label: 'Paintings', type: 'painting'),
+  _BrowseCategory(label: 'Top 1000', masterpieces: true),
+  _BrowseCategory(label: 'Drawings', type: 'drawing'),
+  _BrowseCategory(label: 'Sculptures', type: 'sculpture'),
+  _BrowseCategory(label: 'Photographs', type: 'photograph'),
+  _BrowseCategory(label: 'Furniture', type: 'furniture'),
+];
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,7 +46,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final PagedDataController controller = PagedDataController(context.repository.fetchAll);
+  _BrowseCategory _selectedCategory = _categories.first;
+
+  late final PagedDataController controller = PagedDataController(
+    ({required int page}) => context.repository.fetchAll(
+      page: page,
+      type: _selectedCategory.type ?? 'painting',
+      masterpieces: _selectedCategory.masterpieces,
+    ),
+  );
   final TextEditingController _inputController = TextEditingController();
 
   final ValueNotifier<bool> singleColumn = ValueNotifier<bool>(false);
@@ -38,9 +66,18 @@ class _HomePageState extends State<HomePage> {
 
   LoadingStatus _loadingStatus = LoadingStatus.initial;
 
+  /// Sourced independently from whichever category is currently browsed, so
+  /// Artwork of the Day always draws from the museum's curated highlights.
+  List<Art> _masterpieces = <Art>[];
+
   @override
   void initState() {
     controller.fetch().then(_onFinishedRequest);
+    context.repository.fetchAll(page: 1, masterpieces: true).then((List<Art> arts) {
+      if (mounted) {
+        setState(() => _masterpieces = arts);
+      }
+    });
     super.initState();
 
     AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
@@ -53,6 +90,17 @@ class _HomePageState extends State<HomePage> {
     singleColumn.dispose();
     _inputController.dispose();
     super.dispose();
+  }
+
+  void _onCategorySelected(_BrowseCategory category) {
+    if (identical(category, _selectedCategory)) {
+      return;
+    }
+    setState(() {
+      _selectedCategory = category;
+      _loadingStatus = LoadingStatus.initial;
+    });
+    controller.fetch().then(_onFinishedRequest);
   }
 
   @override
@@ -117,15 +165,41 @@ class _HomePageState extends State<HomePage> {
                           hintStyle: const TextStyle(color: Colors.grey)),
                     )),
                 pinned: true,
-                actions: null,
+                actions: <Widget>[
+                  IconButton(
+                    tooltip: 'Art quiz',
+                    icon: const Icon(Icons.quiz_outlined),
+                    onPressed: () => Navigator.push<dynamic>(
+                      context,
+                      CupertinoPageRoute<dynamic>(builder: (_) => const QuizPage()),
+                    ),
+                  ),
+                ],
                 backgroundColor: Color(0xff141213),
               ),
-              AnimatedBuilder(
-                animation: controller,
-                builder: (BuildContext context, _) => SliverToBoxAdapter(
-                  child: _DiscoverySection(arts: controller.data),
+              SliverToBoxAdapter(
+                child: _DiscoverySection(arts: _masterpieces),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 40,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: _categories.length,
+                    separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
+                    itemBuilder: (BuildContext context, int index) {
+                      final _BrowseCategory category = _categories[index];
+                      return _CategoryChip(
+                        label: category.label,
+                        selected: identical(category, _selectedCategory),
+                        onTap: () => _onCategorySelected(category),
+                      );
+                    },
+                  ),
                 ),
               ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
               AnimatedBuilder(
                 animation: combinedViewModel,
                 builder: (BuildContext context, _) {
@@ -467,6 +541,36 @@ class _RecentlyViewedRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({Key? key, required this.label, required this.selected, required this.onTap})
+      : super(key: key);
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: selected ? const Color(0xffD2FCAC) : Colors.white10,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? const Color(0xff141213) : Colors.white70,
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 class _SearchChip extends StatelessWidget {

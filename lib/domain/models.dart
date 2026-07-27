@@ -53,6 +53,9 @@ class ArtDetail with _$ArtDetail {
     String? physicalMedium,
     ArtImage? webImage,
     required ArtDating dating,
+    required List<String> inscriptions,
+    String? galleryLocation,
+    required bool onDisplay,
   }) = _ArtDetail;
 
   factory ArtDetail.fromJson(Map<String, dynamic> json) => _$ArtDetailFromJson(json);
@@ -121,6 +124,7 @@ extension ArtLinksExtension on ArtLinks {
 @freezed
 class ArtMaker with _$ArtMaker {
   const factory ArtMaker({
+    String? id,
     required String name,
     required String unFixedName,
     String? placeOfBirth,

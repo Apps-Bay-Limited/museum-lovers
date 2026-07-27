@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'loading_spinner.dart';
 
 class CachedImage extends StatelessWidget {
-  const CachedImage({Key? key, required this.url, this.builder}) : super(key: key);
+  const CachedImage({Key? key, required this.url, this.builder, this.fit = BoxFit.cover}) : super(key: key);
 
   final String url;
   final Widget Function(ImageProvider<Object>)? builder;
+  final BoxFit fit;
 
   static const Key loadingKey = Key('loading');
 
@@ -15,7 +16,7 @@ class CachedImage extends StatelessWidget {
   Widget build(BuildContext context) => CachedNetworkImage(
         key: Key(url),
         imageUrl: url,
-        fit: BoxFit.cover,
+        fit: fit,
         imageBuilder: builder != null ? (_, ImageProvider<Object> imageProvider) => builder!(imageProvider) : null,
         placeholder: (_, __) => const LoadingSpinner(key: loadingKey),
         errorWidget: (_, __, Object? ___) => const Center(child: Icon(Icons.error)),

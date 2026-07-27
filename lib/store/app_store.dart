@@ -12,6 +12,7 @@ class AppStore extends ChangeNotifier {
   }
 
   static const String _favoritesKey = 'favorite_arts';
+  static const String _favoriteArtistsKey = 'favorite_artists';
   static const String _recentSearchesKey = 'recent_searches';
   static const String _recentlyViewedKey = 'recently_viewed_arts';
   static const int maxRecentSearches = 10;
@@ -20,11 +21,15 @@ class AppStore extends ChangeNotifier {
   final SharedPreferences _prefs;
 
   final Map<String, Art> _favorites = <String, Art>{};
+  final Map<String, ArtMaker> _favoriteArtists = <String, ArtMaker>{};
   final List<String> _recentSearches = <String>[];
   final List<Art> _recentlyViewed = <Art>[];
 
   /// Favorite artworks in the order they were added.
   List<Art> get favorites => List<Art>.unmodifiable(_favorites.values);
+
+  /// Favorite artists in the order they were added.
+  List<ArtMaker> get favoriteArtists => List<ArtMaker>.unmodifiable(_favoriteArtists.values);
 
   List<String> get recentSearches => List<String>.unmodifiable(_recentSearches);
 
@@ -41,6 +46,27 @@ class AppStore extends ChangeNotifier {
     }
     notifyListeners();
     _saveFavorites();
+  }
+
+  /// Artists without a resolved Person [ArtMaker.id] (e.g. "Anonymous") can't
+  /// be favorited — there's nothing stable to key them by.
+  bool isFavoriteArtist(ArtMaker artist) {
+    final String? id = artist.id;
+    return id != null && _favoriteArtists.containsKey(id);
+  }
+
+  void toggleFavoriteArtist(ArtMaker artist) {
+    final String? id = artist.id;
+    if (id == null) {
+      return;
+    }
+    if (_favoriteArtists.containsKey(id)) {
+      _favoriteArtists.remove(id);
+    } else {
+      _favoriteArtists[id] = artist;
+    }
+    notifyListeners();
+    _saveFavoriteArtists();
   }
 
   void addRecentlyViewed(Art art) {
@@ -91,6 +117,15 @@ class AppStore extends ChangeNotifier {
           _recentlyViewed.add(Art.fromJson(item as Map<String, dynamic>));
         }
       }
+      final String? favoriteArtistsJson = _prefs.getString(_favoriteArtistsKey);
+      if (favoriteArtistsJson != null) {
+        for (final dynamic item in json.decode(favoriteArtistsJson) as List<dynamic>) {
+          final ArtMaker artist = ArtMaker.fromJson(item as Map<String, dynamic>);
+          if (artist.id != null) {
+            _favoriteArtists[artist.id!] = artist;
+          }
+        }
+      }
       _recentSearches.addAll(_prefs.getStringList(_recentSearchesKey) ?? <String>[]);
     } catch (_) {
       // Corrupted preferences — start fresh.
@@ -110,6 +145,13 @@ class AppStore extends ChangeNotifier {
       for (final Art art in _recentlyViewed) art.toJson(),
     ]);
     await _prefs.setString(_recentlyViewedKey, encoded);
+  }
+
+  Future<void> _saveFavoriteArtists() async {
+    final String encoded = json.encode(<Map<String, dynamic>>[
+      for (final ArtMaker artist in _favoriteArtists.values) artist.toJson(),
+    ]);
+    await _prefs.setString(_favoriteArtistsKey, encoded);
   }
 
   Future<void> _saveRecentSearches() async {

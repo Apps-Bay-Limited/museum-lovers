@@ -39,11 +39,9 @@
 		<true/>
 	</dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>The App needs permission to save this photo to your photo library</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The App needs permission to save this photo to your photo library</string>
+	<string>Museum Lovers saves artwork images to your Photos library, for example when you tap the download button on a painting's detail page to keep a copy.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you</string>
+	<string>This identifier is used to show you more relevant ads, for example art exhibits, gallery events, or museum-related apps similar to artworks you've viewed in Museum Lovers.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

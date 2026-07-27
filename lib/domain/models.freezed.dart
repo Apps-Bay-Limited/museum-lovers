@@ -1,6 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'models.dart';
 
@@ -11,48 +12,11 @@ part of 'models.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 Art _$ArtFromJson(Map<String, dynamic> json) {
   return _Art.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtTearOff {
-  const _$ArtTearOff();
-
-  _Art call(
-      {required String id,
-      required String objectNumber,
-      required String title,
-      required String longTitle,
-      required String principalOrFirstMaker,
-      required bool hasImage,
-      required bool showImage,
-      required ArtImage? webImage,
-      required ArtImage? headerImage,
-      required ArtLinks links}) {
-    return _Art(
-      id: id,
-      objectNumber: objectNumber,
-      title: title,
-      longTitle: longTitle,
-      principalOrFirstMaker: principalOrFirstMaker,
-      hasImage: hasImage,
-      showImage: showImage,
-      webImage: webImage,
-      headerImage: headerImage,
-      links: links,
-    );
-  }
-
-  Art fromJson(Map<String, Object?> json) {
-    return Art.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $Art = _$ArtTearOff();
 
 /// @nodoc
 mixin _$Art {
@@ -67,15 +31,20 @@ mixin _$Art {
   ArtImage? get headerImage => throw _privateConstructorUsedError;
   ArtLinks get links => throw _privateConstructorUsedError;
 
+  /// Serializes this Art to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtCopyWith<Art> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $ArtCopyWith<$Res> {
   factory $ArtCopyWith(Art value, $Res Function(Art) then) =
-      _$ArtCopyWithImpl<$Res>;
+      _$ArtCopyWithImpl<$Res, Art>;
+  @useResult
   $Res call(
       {String id,
       String objectNumber,
@@ -94,105 +63,119 @@ abstract class $ArtCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtCopyWithImpl<$Res> implements $ArtCopyWith<$Res> {
+class _$ArtCopyWithImpl<$Res, $Val extends Art> implements $ArtCopyWith<$Res> {
   _$ArtCopyWithImpl(this._value, this._then);
 
-  final Art _value;
   // ignore: unused_field
-  final $Res Function(Art) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? objectNumber = freezed,
-    Object? title = freezed,
-    Object? longTitle = freezed,
-    Object? principalOrFirstMaker = freezed,
-    Object? hasImage = freezed,
-    Object? showImage = freezed,
+    Object? id = null,
+    Object? objectNumber = null,
+    Object? title = null,
+    Object? longTitle = null,
+    Object? principalOrFirstMaker = null,
+    Object? hasImage = null,
+    Object? showImage = null,
     Object? webImage = freezed,
     Object? headerImage = freezed,
-    Object? links = freezed,
+    Object? links = null,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      objectNumber: objectNumber == freezed
+      objectNumber: null == objectNumber
           ? _value.objectNumber
           : objectNumber // ignore: cast_nullable_to_non_nullable
               as String,
-      title: title == freezed
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      longTitle: longTitle == freezed
+      longTitle: null == longTitle
           ? _value.longTitle
           : longTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      principalOrFirstMaker: principalOrFirstMaker == freezed
+      principalOrFirstMaker: null == principalOrFirstMaker
           ? _value.principalOrFirstMaker
           : principalOrFirstMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      hasImage: hasImage == freezed
+      hasImage: null == hasImage
           ? _value.hasImage
           : hasImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      showImage: showImage == freezed
+      showImage: null == showImage
           ? _value.showImage
           : showImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      webImage: webImage == freezed
+      webImage: freezed == webImage
           ? _value.webImage
           : webImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      headerImage: headerImage == freezed
+      headerImage: freezed == headerImage
           ? _value.headerImage
           : headerImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      links: links == freezed
+      links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
               as ArtLinks,
-    ));
+    ) as $Val);
   }
 
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtImageCopyWith<$Res>? get webImage {
     if (_value.webImage == null) {
       return null;
     }
 
     return $ArtImageCopyWith<$Res>(_value.webImage!, (value) {
-      return _then(_value.copyWith(webImage: value));
+      return _then(_value.copyWith(webImage: value) as $Val);
     });
   }
 
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtImageCopyWith<$Res>? get headerImage {
     if (_value.headerImage == null) {
       return null;
     }
 
     return $ArtImageCopyWith<$Res>(_value.headerImage!, (value) {
-      return _then(_value.copyWith(headerImage: value));
+      return _then(_value.copyWith(headerImage: value) as $Val);
     });
   }
 
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtLinksCopyWith<$Res> get links {
     return $ArtLinksCopyWith<$Res>(_value.links, (value) {
-      return _then(_value.copyWith(links: value));
+      return _then(_value.copyWith(links: value) as $Val);
     });
   }
 }
 
 /// @nodoc
-abstract class _$ArtCopyWith<$Res> implements $ArtCopyWith<$Res> {
-  factory _$ArtCopyWith(_Art value, $Res Function(_Art) then) =
-      __$ArtCopyWithImpl<$Res>;
+abstract class _$$ArtImplCopyWith<$Res> implements $ArtCopyWith<$Res> {
+  factory _$$ArtImplCopyWith(_$ArtImpl value, $Res Function(_$ArtImpl) then) =
+      __$$ArtImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String id,
       String objectNumber,
@@ -214,65 +197,65 @@ abstract class _$ArtCopyWith<$Res> implements $ArtCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ArtCopyWithImpl<$Res> extends _$ArtCopyWithImpl<$Res>
-    implements _$ArtCopyWith<$Res> {
-  __$ArtCopyWithImpl(_Art _value, $Res Function(_Art) _then)
-      : super(_value, (v) => _then(v as _Art));
+class __$$ArtImplCopyWithImpl<$Res> extends _$ArtCopyWithImpl<$Res, _$ArtImpl>
+    implements _$$ArtImplCopyWith<$Res> {
+  __$$ArtImplCopyWithImpl(_$ArtImpl _value, $Res Function(_$ArtImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _Art get _value => super._value as _Art;
-
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? objectNumber = freezed,
-    Object? title = freezed,
-    Object? longTitle = freezed,
-    Object? principalOrFirstMaker = freezed,
-    Object? hasImage = freezed,
-    Object? showImage = freezed,
+    Object? id = null,
+    Object? objectNumber = null,
+    Object? title = null,
+    Object? longTitle = null,
+    Object? principalOrFirstMaker = null,
+    Object? hasImage = null,
+    Object? showImage = null,
     Object? webImage = freezed,
     Object? headerImage = freezed,
-    Object? links = freezed,
+    Object? links = null,
   }) {
-    return _then(_Art(
-      id: id == freezed
+    return _then(_$ArtImpl(
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      objectNumber: objectNumber == freezed
+      objectNumber: null == objectNumber
           ? _value.objectNumber
           : objectNumber // ignore: cast_nullable_to_non_nullable
               as String,
-      title: title == freezed
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      longTitle: longTitle == freezed
+      longTitle: null == longTitle
           ? _value.longTitle
           : longTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      principalOrFirstMaker: principalOrFirstMaker == freezed
+      principalOrFirstMaker: null == principalOrFirstMaker
           ? _value.principalOrFirstMaker
           : principalOrFirstMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      hasImage: hasImage == freezed
+      hasImage: null == hasImage
           ? _value.hasImage
           : hasImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      showImage: showImage == freezed
+      showImage: null == showImage
           ? _value.showImage
           : showImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      webImage: webImage == freezed
+      webImage: freezed == webImage
           ? _value.webImage
           : webImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      headerImage: headerImage == freezed
+      headerImage: freezed == headerImage
           ? _value.headerImage
           : headerImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      links: links == freezed
+      links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
               as ArtLinks,
@@ -282,8 +265,8 @@ class __$ArtCopyWithImpl<$Res> extends _$ArtCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Art implements _Art {
-  const _$_Art(
+class _$ArtImpl implements _Art {
+  const _$ArtImpl(
       {required this.id,
       required this.objectNumber,
       required this.title,
@@ -295,7 +278,8 @@ class _$_Art implements _Art {
       required this.headerImage,
       required this.links});
 
-  factory _$_Art.fromJson(Map<String, dynamic> json) => _$$_ArtFromJson(json);
+  factory _$ArtImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtImplFromJson(json);
 
   @override
   final String id;
@@ -324,64 +308,74 @@ class _$_Art implements _Art {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Art &&
-            const DeepCollectionEquality().equals(other.id, id) &&
-            const DeepCollectionEquality()
-                .equals(other.objectNumber, objectNumber) &&
-            const DeepCollectionEquality().equals(other.title, title) &&
-            const DeepCollectionEquality().equals(other.longTitle, longTitle) &&
-            const DeepCollectionEquality()
-                .equals(other.principalOrFirstMaker, principalOrFirstMaker) &&
-            const DeepCollectionEquality().equals(other.hasImage, hasImage) &&
-            const DeepCollectionEquality().equals(other.showImage, showImage) &&
-            const DeepCollectionEquality().equals(other.webImage, webImage) &&
-            const DeepCollectionEquality()
-                .equals(other.headerImage, headerImage) &&
-            const DeepCollectionEquality().equals(other.links, links));
+            other is _$ArtImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.objectNumber, objectNumber) ||
+                other.objectNumber == objectNumber) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.longTitle, longTitle) ||
+                other.longTitle == longTitle) &&
+            (identical(other.principalOrFirstMaker, principalOrFirstMaker) ||
+                other.principalOrFirstMaker == principalOrFirstMaker) &&
+            (identical(other.hasImage, hasImage) ||
+                other.hasImage == hasImage) &&
+            (identical(other.showImage, showImage) ||
+                other.showImage == showImage) &&
+            (identical(other.webImage, webImage) ||
+                other.webImage == webImage) &&
+            (identical(other.headerImage, headerImage) ||
+                other.headerImage == headerImage) &&
+            (identical(other.links, links) || other.links == links));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(id),
-      const DeepCollectionEquality().hash(objectNumber),
-      const DeepCollectionEquality().hash(title),
-      const DeepCollectionEquality().hash(longTitle),
-      const DeepCollectionEquality().hash(principalOrFirstMaker),
-      const DeepCollectionEquality().hash(hasImage),
-      const DeepCollectionEquality().hash(showImage),
-      const DeepCollectionEquality().hash(webImage),
-      const DeepCollectionEquality().hash(headerImage),
-      const DeepCollectionEquality().hash(links));
+      id,
+      objectNumber,
+      title,
+      longTitle,
+      principalOrFirstMaker,
+      hasImage,
+      showImage,
+      webImage,
+      headerImage,
+      links);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtCopyWith<_Art> get copyWith =>
-      __$ArtCopyWithImpl<_Art>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtImplCopyWith<_$ArtImpl> get copyWith =>
+      __$$ArtImplCopyWithImpl<_$ArtImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtToJson(this);
+    return _$$ArtImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _Art implements Art {
   const factory _Art(
-      {required String id,
-      required String objectNumber,
-      required String title,
-      required String longTitle,
-      required String principalOrFirstMaker,
-      required bool hasImage,
-      required bool showImage,
-      required ArtImage? webImage,
-      required ArtImage? headerImage,
-      required ArtLinks links}) = _$_Art;
+      {required final String id,
+      required final String objectNumber,
+      required final String title,
+      required final String longTitle,
+      required final String principalOrFirstMaker,
+      required final bool hasImage,
+      required final bool showImage,
+      required final ArtImage? webImage,
+      required final ArtImage? headerImage,
+      required final ArtLinks links}) = _$ArtImpl;
 
-  factory _Art.fromJson(Map<String, dynamic> json) = _$_Art.fromJson;
+  factory _Art.fromJson(Map<String, dynamic> json) = _$ArtImpl.fromJson;
 
   @override
   String get id;
@@ -403,89 +397,18 @@ abstract class _Art implements Art {
   ArtImage? get headerImage;
   @override
   ArtLinks get links;
+
+  /// Create a copy of Art
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtCopyWith<_Art> get copyWith => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtImplCopyWith<_$ArtImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 ArtDetail _$ArtDetailFromJson(Map<String, dynamic> json) {
   return _ArtDetail.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtDetailTearOff {
-  const _$ArtDetailTearOff();
-
-  _ArtDetail call(
-      {required String id,
-      required String objectNumber,
-      required List<ArtColor> colors,
-      required List<ArtColor> normalizedColors,
-      required String title,
-      required List<String> titles,
-      required String longTitle,
-      required String subTitle,
-      required String scLabelLine,
-      required ArtLabel label,
-      String? description,
-      required List<String> objectTypes,
-      required List<String> objectCollection,
-      required String principalMaker,
-      required String principalOrFirstMaker,
-      required List<ArtMaker> principalMakers,
-      String? plaqueDescriptionEnglish,
-      required List<String> materials,
-      required List<String> productionPlaces,
-      required List<String> techniques,
-      required List<String> physicalProperties,
-      required bool hasImage,
-      required bool showImage,
-      required List<String> historicalPersons,
-      required List<String> documentation,
-      required List<ArtDimension> dimensions,
-      String? physicalMedium,
-      ArtImage? webImage,
-      required ArtDating dating}) {
-    return _ArtDetail(
-      id: id,
-      objectNumber: objectNumber,
-      colors: colors,
-      normalizedColors: normalizedColors,
-      title: title,
-      titles: titles,
-      longTitle: longTitle,
-      subTitle: subTitle,
-      scLabelLine: scLabelLine,
-      label: label,
-      description: description,
-      objectTypes: objectTypes,
-      objectCollection: objectCollection,
-      principalMaker: principalMaker,
-      principalOrFirstMaker: principalOrFirstMaker,
-      principalMakers: principalMakers,
-      plaqueDescriptionEnglish: plaqueDescriptionEnglish,
-      materials: materials,
-      productionPlaces: productionPlaces,
-      techniques: techniques,
-      physicalProperties: physicalProperties,
-      hasImage: hasImage,
-      showImage: showImage,
-      historicalPersons: historicalPersons,
-      documentation: documentation,
-      dimensions: dimensions,
-      physicalMedium: physicalMedium,
-      webImage: webImage,
-      dating: dating,
-    );
-  }
-
-  ArtDetail fromJson(Map<String, Object?> json) {
-    return ArtDetail.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtDetail = _$ArtDetailTearOff();
 
 /// @nodoc
 mixin _$ArtDetail {
@@ -518,9 +441,16 @@ mixin _$ArtDetail {
   String? get physicalMedium => throw _privateConstructorUsedError;
   ArtImage? get webImage => throw _privateConstructorUsedError;
   ArtDating get dating => throw _privateConstructorUsedError;
+  List<String> get inscriptions => throw _privateConstructorUsedError;
+  String? get galleryLocation => throw _privateConstructorUsedError;
+  bool get onDisplay => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtDetail to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtDetailCopyWith<ArtDetail> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -528,7 +458,8 @@ mixin _$ArtDetail {
 /// @nodoc
 abstract class $ArtDetailCopyWith<$Res> {
   factory $ArtDetailCopyWith(ArtDetail value, $Res Function(ArtDetail) then) =
-      _$ArtDetailCopyWithImpl<$Res>;
+      _$ArtDetailCopyWithImpl<$Res, ArtDetail>;
+  @useResult
   $Res call(
       {String id,
       String objectNumber,
@@ -558,7 +489,10 @@ abstract class $ArtDetailCopyWith<$Res> {
       List<ArtDimension> dimensions,
       String? physicalMedium,
       ArtImage? webImage,
-      ArtDating dating});
+      ArtDating dating,
+      List<String> inscriptions,
+      String? galleryLocation,
+      bool onDisplay});
 
   $ArtLabelCopyWith<$Res> get label;
   $ArtImageCopyWith<$Res>? get webImage;
@@ -566,197 +500,228 @@ abstract class $ArtDetailCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtDetailCopyWithImpl<$Res> implements $ArtDetailCopyWith<$Res> {
+class _$ArtDetailCopyWithImpl<$Res, $Val extends ArtDetail>
+    implements $ArtDetailCopyWith<$Res> {
   _$ArtDetailCopyWithImpl(this._value, this._then);
 
-  final ArtDetail _value;
   // ignore: unused_field
-  final $Res Function(ArtDetail) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? objectNumber = freezed,
-    Object? colors = freezed,
-    Object? normalizedColors = freezed,
-    Object? title = freezed,
-    Object? titles = freezed,
-    Object? longTitle = freezed,
-    Object? subTitle = freezed,
-    Object? scLabelLine = freezed,
-    Object? label = freezed,
+    Object? id = null,
+    Object? objectNumber = null,
+    Object? colors = null,
+    Object? normalizedColors = null,
+    Object? title = null,
+    Object? titles = null,
+    Object? longTitle = null,
+    Object? subTitle = null,
+    Object? scLabelLine = null,
+    Object? label = null,
     Object? description = freezed,
-    Object? objectTypes = freezed,
-    Object? objectCollection = freezed,
-    Object? principalMaker = freezed,
-    Object? principalOrFirstMaker = freezed,
-    Object? principalMakers = freezed,
+    Object? objectTypes = null,
+    Object? objectCollection = null,
+    Object? principalMaker = null,
+    Object? principalOrFirstMaker = null,
+    Object? principalMakers = null,
     Object? plaqueDescriptionEnglish = freezed,
-    Object? materials = freezed,
-    Object? productionPlaces = freezed,
-    Object? techniques = freezed,
-    Object? physicalProperties = freezed,
-    Object? hasImage = freezed,
-    Object? showImage = freezed,
-    Object? historicalPersons = freezed,
-    Object? documentation = freezed,
-    Object? dimensions = freezed,
+    Object? materials = null,
+    Object? productionPlaces = null,
+    Object? techniques = null,
+    Object? physicalProperties = null,
+    Object? hasImage = null,
+    Object? showImage = null,
+    Object? historicalPersons = null,
+    Object? documentation = null,
+    Object? dimensions = null,
     Object? physicalMedium = freezed,
     Object? webImage = freezed,
-    Object? dating = freezed,
+    Object? dating = null,
+    Object? inscriptions = null,
+    Object? galleryLocation = freezed,
+    Object? onDisplay = null,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      objectNumber: objectNumber == freezed
+      objectNumber: null == objectNumber
           ? _value.objectNumber
           : objectNumber // ignore: cast_nullable_to_non_nullable
               as String,
-      colors: colors == freezed
+      colors: null == colors
           ? _value.colors
           : colors // ignore: cast_nullable_to_non_nullable
               as List<ArtColor>,
-      normalizedColors: normalizedColors == freezed
+      normalizedColors: null == normalizedColors
           ? _value.normalizedColors
           : normalizedColors // ignore: cast_nullable_to_non_nullable
               as List<ArtColor>,
-      title: title == freezed
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      titles: titles == freezed
+      titles: null == titles
           ? _value.titles
           : titles // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      longTitle: longTitle == freezed
+      longTitle: null == longTitle
           ? _value.longTitle
           : longTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      subTitle: subTitle == freezed
+      subTitle: null == subTitle
           ? _value.subTitle
           : subTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      scLabelLine: scLabelLine == freezed
+      scLabelLine: null == scLabelLine
           ? _value.scLabelLine
           : scLabelLine // ignore: cast_nullable_to_non_nullable
               as String,
-      label: label == freezed
+      label: null == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
               as ArtLabel,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      objectTypes: objectTypes == freezed
+      objectTypes: null == objectTypes
           ? _value.objectTypes
           : objectTypes // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      objectCollection: objectCollection == freezed
+      objectCollection: null == objectCollection
           ? _value.objectCollection
           : objectCollection // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      principalMaker: principalMaker == freezed
+      principalMaker: null == principalMaker
           ? _value.principalMaker
           : principalMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      principalOrFirstMaker: principalOrFirstMaker == freezed
+      principalOrFirstMaker: null == principalOrFirstMaker
           ? _value.principalOrFirstMaker
           : principalOrFirstMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      principalMakers: principalMakers == freezed
+      principalMakers: null == principalMakers
           ? _value.principalMakers
           : principalMakers // ignore: cast_nullable_to_non_nullable
               as List<ArtMaker>,
-      plaqueDescriptionEnglish: plaqueDescriptionEnglish == freezed
+      plaqueDescriptionEnglish: freezed == plaqueDescriptionEnglish
           ? _value.plaqueDescriptionEnglish
           : plaqueDescriptionEnglish // ignore: cast_nullable_to_non_nullable
               as String?,
-      materials: materials == freezed
+      materials: null == materials
           ? _value.materials
           : materials // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      productionPlaces: productionPlaces == freezed
+      productionPlaces: null == productionPlaces
           ? _value.productionPlaces
           : productionPlaces // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      techniques: techniques == freezed
+      techniques: null == techniques
           ? _value.techniques
           : techniques // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      physicalProperties: physicalProperties == freezed
+      physicalProperties: null == physicalProperties
           ? _value.physicalProperties
           : physicalProperties // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      hasImage: hasImage == freezed
+      hasImage: null == hasImage
           ? _value.hasImage
           : hasImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      showImage: showImage == freezed
+      showImage: null == showImage
           ? _value.showImage
           : showImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      historicalPersons: historicalPersons == freezed
+      historicalPersons: null == historicalPersons
           ? _value.historicalPersons
           : historicalPersons // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      documentation: documentation == freezed
+      documentation: null == documentation
           ? _value.documentation
           : documentation // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      dimensions: dimensions == freezed
+      dimensions: null == dimensions
           ? _value.dimensions
           : dimensions // ignore: cast_nullable_to_non_nullable
               as List<ArtDimension>,
-      physicalMedium: physicalMedium == freezed
+      physicalMedium: freezed == physicalMedium
           ? _value.physicalMedium
           : physicalMedium // ignore: cast_nullable_to_non_nullable
               as String?,
-      webImage: webImage == freezed
+      webImage: freezed == webImage
           ? _value.webImage
           : webImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      dating: dating == freezed
+      dating: null == dating
           ? _value.dating
           : dating // ignore: cast_nullable_to_non_nullable
               as ArtDating,
-    ));
+      inscriptions: null == inscriptions
+          ? _value.inscriptions
+          : inscriptions // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      galleryLocation: freezed == galleryLocation
+          ? _value.galleryLocation
+          : galleryLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
+      onDisplay: null == onDisplay
+          ? _value.onDisplay
+          : onDisplay // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
   }
 
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtLabelCopyWith<$Res> get label {
     return $ArtLabelCopyWith<$Res>(_value.label, (value) {
-      return _then(_value.copyWith(label: value));
+      return _then(_value.copyWith(label: value) as $Val);
     });
   }
 
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtImageCopyWith<$Res>? get webImage {
     if (_value.webImage == null) {
       return null;
     }
 
     return $ArtImageCopyWith<$Res>(_value.webImage!, (value) {
-      return _then(_value.copyWith(webImage: value));
+      return _then(_value.copyWith(webImage: value) as $Val);
     });
   }
 
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
   @override
+  @pragma('vm:prefer-inline')
   $ArtDatingCopyWith<$Res> get dating {
     return $ArtDatingCopyWith<$Res>(_value.dating, (value) {
-      return _then(_value.copyWith(dating: value));
+      return _then(_value.copyWith(dating: value) as $Val);
     });
   }
 }
 
 /// @nodoc
-abstract class _$ArtDetailCopyWith<$Res> implements $ArtDetailCopyWith<$Res> {
-  factory _$ArtDetailCopyWith(
-          _ArtDetail value, $Res Function(_ArtDetail) then) =
-      __$ArtDetailCopyWithImpl<$Res>;
+abstract class _$$ArtDetailImplCopyWith<$Res>
+    implements $ArtDetailCopyWith<$Res> {
+  factory _$$ArtDetailImplCopyWith(
+          _$ArtDetailImpl value, $Res Function(_$ArtDetailImpl) then) =
+      __$$ArtDetailImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String id,
       String objectNumber,
@@ -786,7 +751,10 @@ abstract class _$ArtDetailCopyWith<$Res> implements $ArtDetailCopyWith<$Res> {
       List<ArtDimension> dimensions,
       String? physicalMedium,
       ArtImage? webImage,
-      ArtDating dating});
+      ArtDating dating,
+      List<String> inscriptions,
+      String? galleryLocation,
+      bool onDisplay});
 
   @override
   $ArtLabelCopyWith<$Res> get label;
@@ -797,216 +765,269 @@ abstract class _$ArtDetailCopyWith<$Res> implements $ArtDetailCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ArtDetailCopyWithImpl<$Res> extends _$ArtDetailCopyWithImpl<$Res>
-    implements _$ArtDetailCopyWith<$Res> {
-  __$ArtDetailCopyWithImpl(_ArtDetail _value, $Res Function(_ArtDetail) _then)
-      : super(_value, (v) => _then(v as _ArtDetail));
+class __$$ArtDetailImplCopyWithImpl<$Res>
+    extends _$ArtDetailCopyWithImpl<$Res, _$ArtDetailImpl>
+    implements _$$ArtDetailImplCopyWith<$Res> {
+  __$$ArtDetailImplCopyWithImpl(
+      _$ArtDetailImpl _value, $Res Function(_$ArtDetailImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtDetail get _value => super._value as _ArtDetail;
-
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? objectNumber = freezed,
-    Object? colors = freezed,
-    Object? normalizedColors = freezed,
-    Object? title = freezed,
-    Object? titles = freezed,
-    Object? longTitle = freezed,
-    Object? subTitle = freezed,
-    Object? scLabelLine = freezed,
-    Object? label = freezed,
+    Object? id = null,
+    Object? objectNumber = null,
+    Object? colors = null,
+    Object? normalizedColors = null,
+    Object? title = null,
+    Object? titles = null,
+    Object? longTitle = null,
+    Object? subTitle = null,
+    Object? scLabelLine = null,
+    Object? label = null,
     Object? description = freezed,
-    Object? objectTypes = freezed,
-    Object? objectCollection = freezed,
-    Object? principalMaker = freezed,
-    Object? principalOrFirstMaker = freezed,
-    Object? principalMakers = freezed,
+    Object? objectTypes = null,
+    Object? objectCollection = null,
+    Object? principalMaker = null,
+    Object? principalOrFirstMaker = null,
+    Object? principalMakers = null,
     Object? plaqueDescriptionEnglish = freezed,
-    Object? materials = freezed,
-    Object? productionPlaces = freezed,
-    Object? techniques = freezed,
-    Object? physicalProperties = freezed,
-    Object? hasImage = freezed,
-    Object? showImage = freezed,
-    Object? historicalPersons = freezed,
-    Object? documentation = freezed,
-    Object? dimensions = freezed,
+    Object? materials = null,
+    Object? productionPlaces = null,
+    Object? techniques = null,
+    Object? physicalProperties = null,
+    Object? hasImage = null,
+    Object? showImage = null,
+    Object? historicalPersons = null,
+    Object? documentation = null,
+    Object? dimensions = null,
     Object? physicalMedium = freezed,
     Object? webImage = freezed,
-    Object? dating = freezed,
+    Object? dating = null,
+    Object? inscriptions = null,
+    Object? galleryLocation = freezed,
+    Object? onDisplay = null,
   }) {
-    return _then(_ArtDetail(
-      id: id == freezed
+    return _then(_$ArtDetailImpl(
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      objectNumber: objectNumber == freezed
+      objectNumber: null == objectNumber
           ? _value.objectNumber
           : objectNumber // ignore: cast_nullable_to_non_nullable
               as String,
-      colors: colors == freezed
-          ? _value.colors
+      colors: null == colors
+          ? _value._colors
           : colors // ignore: cast_nullable_to_non_nullable
               as List<ArtColor>,
-      normalizedColors: normalizedColors == freezed
-          ? _value.normalizedColors
+      normalizedColors: null == normalizedColors
+          ? _value._normalizedColors
           : normalizedColors // ignore: cast_nullable_to_non_nullable
               as List<ArtColor>,
-      title: title == freezed
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      titles: titles == freezed
-          ? _value.titles
+      titles: null == titles
+          ? _value._titles
           : titles // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      longTitle: longTitle == freezed
+      longTitle: null == longTitle
           ? _value.longTitle
           : longTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      subTitle: subTitle == freezed
+      subTitle: null == subTitle
           ? _value.subTitle
           : subTitle // ignore: cast_nullable_to_non_nullable
               as String,
-      scLabelLine: scLabelLine == freezed
+      scLabelLine: null == scLabelLine
           ? _value.scLabelLine
           : scLabelLine // ignore: cast_nullable_to_non_nullable
               as String,
-      label: label == freezed
+      label: null == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
               as ArtLabel,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      objectTypes: objectTypes == freezed
-          ? _value.objectTypes
+      objectTypes: null == objectTypes
+          ? _value._objectTypes
           : objectTypes // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      objectCollection: objectCollection == freezed
-          ? _value.objectCollection
+      objectCollection: null == objectCollection
+          ? _value._objectCollection
           : objectCollection // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      principalMaker: principalMaker == freezed
+      principalMaker: null == principalMaker
           ? _value.principalMaker
           : principalMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      principalOrFirstMaker: principalOrFirstMaker == freezed
+      principalOrFirstMaker: null == principalOrFirstMaker
           ? _value.principalOrFirstMaker
           : principalOrFirstMaker // ignore: cast_nullable_to_non_nullable
               as String,
-      principalMakers: principalMakers == freezed
-          ? _value.principalMakers
+      principalMakers: null == principalMakers
+          ? _value._principalMakers
           : principalMakers // ignore: cast_nullable_to_non_nullable
               as List<ArtMaker>,
-      plaqueDescriptionEnglish: plaqueDescriptionEnglish == freezed
+      plaqueDescriptionEnglish: freezed == plaqueDescriptionEnglish
           ? _value.plaqueDescriptionEnglish
           : plaqueDescriptionEnglish // ignore: cast_nullable_to_non_nullable
               as String?,
-      materials: materials == freezed
-          ? _value.materials
+      materials: null == materials
+          ? _value._materials
           : materials // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      productionPlaces: productionPlaces == freezed
-          ? _value.productionPlaces
+      productionPlaces: null == productionPlaces
+          ? _value._productionPlaces
           : productionPlaces // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      techniques: techniques == freezed
-          ? _value.techniques
+      techniques: null == techniques
+          ? _value._techniques
           : techniques // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      physicalProperties: physicalProperties == freezed
-          ? _value.physicalProperties
+      physicalProperties: null == physicalProperties
+          ? _value._physicalProperties
           : physicalProperties // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      hasImage: hasImage == freezed
+      hasImage: null == hasImage
           ? _value.hasImage
           : hasImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      showImage: showImage == freezed
+      showImage: null == showImage
           ? _value.showImage
           : showImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      historicalPersons: historicalPersons == freezed
-          ? _value.historicalPersons
+      historicalPersons: null == historicalPersons
+          ? _value._historicalPersons
           : historicalPersons // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      documentation: documentation == freezed
-          ? _value.documentation
+      documentation: null == documentation
+          ? _value._documentation
           : documentation // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      dimensions: dimensions == freezed
-          ? _value.dimensions
+      dimensions: null == dimensions
+          ? _value._dimensions
           : dimensions // ignore: cast_nullable_to_non_nullable
               as List<ArtDimension>,
-      physicalMedium: physicalMedium == freezed
+      physicalMedium: freezed == physicalMedium
           ? _value.physicalMedium
           : physicalMedium // ignore: cast_nullable_to_non_nullable
               as String?,
-      webImage: webImage == freezed
+      webImage: freezed == webImage
           ? _value.webImage
           : webImage // ignore: cast_nullable_to_non_nullable
               as ArtImage?,
-      dating: dating == freezed
+      dating: null == dating
           ? _value.dating
           : dating // ignore: cast_nullable_to_non_nullable
               as ArtDating,
+      inscriptions: null == inscriptions
+          ? _value._inscriptions
+          : inscriptions // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      galleryLocation: freezed == galleryLocation
+          ? _value.galleryLocation
+          : galleryLocation // ignore: cast_nullable_to_non_nullable
+              as String?,
+      onDisplay: null == onDisplay
+          ? _value.onDisplay
+          : onDisplay // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtDetail implements _ArtDetail {
-  const _$_ArtDetail(
+class _$ArtDetailImpl implements _ArtDetail {
+  const _$ArtDetailImpl(
       {required this.id,
       required this.objectNumber,
-      required this.colors,
-      required this.normalizedColors,
+      required final List<ArtColor> colors,
+      required final List<ArtColor> normalizedColors,
       required this.title,
-      required this.titles,
+      required final List<String> titles,
       required this.longTitle,
       required this.subTitle,
       required this.scLabelLine,
       required this.label,
       this.description,
-      required this.objectTypes,
-      required this.objectCollection,
+      required final List<String> objectTypes,
+      required final List<String> objectCollection,
       required this.principalMaker,
       required this.principalOrFirstMaker,
-      required this.principalMakers,
+      required final List<ArtMaker> principalMakers,
       this.plaqueDescriptionEnglish,
-      required this.materials,
-      required this.productionPlaces,
-      required this.techniques,
-      required this.physicalProperties,
+      required final List<String> materials,
+      required final List<String> productionPlaces,
+      required final List<String> techniques,
+      required final List<String> physicalProperties,
       required this.hasImage,
       required this.showImage,
-      required this.historicalPersons,
-      required this.documentation,
-      required this.dimensions,
+      required final List<String> historicalPersons,
+      required final List<String> documentation,
+      required final List<ArtDimension> dimensions,
       this.physicalMedium,
       this.webImage,
-      required this.dating});
+      required this.dating,
+      required final List<String> inscriptions,
+      this.galleryLocation,
+      required this.onDisplay})
+      : _colors = colors,
+        _normalizedColors = normalizedColors,
+        _titles = titles,
+        _objectTypes = objectTypes,
+        _objectCollection = objectCollection,
+        _principalMakers = principalMakers,
+        _materials = materials,
+        _productionPlaces = productionPlaces,
+        _techniques = techniques,
+        _physicalProperties = physicalProperties,
+        _historicalPersons = historicalPersons,
+        _documentation = documentation,
+        _dimensions = dimensions,
+        _inscriptions = inscriptions;
 
-  factory _$_ArtDetail.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtDetailFromJson(json);
+  factory _$ArtDetailImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtDetailImplFromJson(json);
 
   @override
   final String id;
   @override
   final String objectNumber;
+  final List<ArtColor> _colors;
   @override
-  final List<ArtColor> colors;
+  List<ArtColor> get colors {
+    if (_colors is EqualUnmodifiableListView) return _colors;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_colors);
+  }
+
+  final List<ArtColor> _normalizedColors;
   @override
-  final List<ArtColor> normalizedColors;
+  List<ArtColor> get normalizedColors {
+    if (_normalizedColors is EqualUnmodifiableListView)
+      return _normalizedColors;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_normalizedColors);
+  }
+
   @override
   final String title;
+  final List<String> _titles;
   @override
-  final List<String> titles;
+  List<String> get titles {
+    if (_titles is EqualUnmodifiableListView) return _titles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_titles);
+  }
+
   @override
   final String longTitle;
   @override
@@ -1017,180 +1038,281 @@ class _$_ArtDetail implements _ArtDetail {
   final ArtLabel label;
   @override
   final String? description;
+  final List<String> _objectTypes;
   @override
-  final List<String> objectTypes;
+  List<String> get objectTypes {
+    if (_objectTypes is EqualUnmodifiableListView) return _objectTypes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_objectTypes);
+  }
+
+  final List<String> _objectCollection;
   @override
-  final List<String> objectCollection;
+  List<String> get objectCollection {
+    if (_objectCollection is EqualUnmodifiableListView)
+      return _objectCollection;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_objectCollection);
+  }
+
   @override
   final String principalMaker;
   @override
   final String principalOrFirstMaker;
+  final List<ArtMaker> _principalMakers;
   @override
-  final List<ArtMaker> principalMakers;
+  List<ArtMaker> get principalMakers {
+    if (_principalMakers is EqualUnmodifiableListView) return _principalMakers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_principalMakers);
+  }
+
   @override
   final String? plaqueDescriptionEnglish;
+  final List<String> _materials;
   @override
-  final List<String> materials;
+  List<String> get materials {
+    if (_materials is EqualUnmodifiableListView) return _materials;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_materials);
+  }
+
+  final List<String> _productionPlaces;
   @override
-  final List<String> productionPlaces;
+  List<String> get productionPlaces {
+    if (_productionPlaces is EqualUnmodifiableListView)
+      return _productionPlaces;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_productionPlaces);
+  }
+
+  final List<String> _techniques;
   @override
-  final List<String> techniques;
+  List<String> get techniques {
+    if (_techniques is EqualUnmodifiableListView) return _techniques;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_techniques);
+  }
+
+  final List<String> _physicalProperties;
   @override
-  final List<String> physicalProperties;
+  List<String> get physicalProperties {
+    if (_physicalProperties is EqualUnmodifiableListView)
+      return _physicalProperties;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_physicalProperties);
+  }
+
   @override
   final bool hasImage;
   @override
   final bool showImage;
+  final List<String> _historicalPersons;
   @override
-  final List<String> historicalPersons;
+  List<String> get historicalPersons {
+    if (_historicalPersons is EqualUnmodifiableListView)
+      return _historicalPersons;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_historicalPersons);
+  }
+
+  final List<String> _documentation;
   @override
-  final List<String> documentation;
+  List<String> get documentation {
+    if (_documentation is EqualUnmodifiableListView) return _documentation;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_documentation);
+  }
+
+  final List<ArtDimension> _dimensions;
   @override
-  final List<ArtDimension> dimensions;
+  List<ArtDimension> get dimensions {
+    if (_dimensions is EqualUnmodifiableListView) return _dimensions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_dimensions);
+  }
+
   @override
   final String? physicalMedium;
   @override
   final ArtImage? webImage;
   @override
   final ArtDating dating;
+  final List<String> _inscriptions;
+  @override
+  List<String> get inscriptions {
+    if (_inscriptions is EqualUnmodifiableListView) return _inscriptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_inscriptions);
+  }
+
+  @override
+  final String? galleryLocation;
+  @override
+  final bool onDisplay;
 
   @override
   String toString() {
-    return 'ArtDetail(id: $id, objectNumber: $objectNumber, colors: $colors, normalizedColors: $normalizedColors, title: $title, titles: $titles, longTitle: $longTitle, subTitle: $subTitle, scLabelLine: $scLabelLine, label: $label, description: $description, objectTypes: $objectTypes, objectCollection: $objectCollection, principalMaker: $principalMaker, principalOrFirstMaker: $principalOrFirstMaker, principalMakers: $principalMakers, plaqueDescriptionEnglish: $plaqueDescriptionEnglish, materials: $materials, productionPlaces: $productionPlaces, techniques: $techniques, physicalProperties: $physicalProperties, hasImage: $hasImage, showImage: $showImage, historicalPersons: $historicalPersons, documentation: $documentation, dimensions: $dimensions, physicalMedium: $physicalMedium, webImage: $webImage, dating: $dating)';
+    return 'ArtDetail(id: $id, objectNumber: $objectNumber, colors: $colors, normalizedColors: $normalizedColors, title: $title, titles: $titles, longTitle: $longTitle, subTitle: $subTitle, scLabelLine: $scLabelLine, label: $label, description: $description, objectTypes: $objectTypes, objectCollection: $objectCollection, principalMaker: $principalMaker, principalOrFirstMaker: $principalOrFirstMaker, principalMakers: $principalMakers, plaqueDescriptionEnglish: $plaqueDescriptionEnglish, materials: $materials, productionPlaces: $productionPlaces, techniques: $techniques, physicalProperties: $physicalProperties, hasImage: $hasImage, showImage: $showImage, historicalPersons: $historicalPersons, documentation: $documentation, dimensions: $dimensions, physicalMedium: $physicalMedium, webImage: $webImage, dating: $dating, inscriptions: $inscriptions, galleryLocation: $galleryLocation, onDisplay: $onDisplay)';
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtDetail &&
-            const DeepCollectionEquality().equals(other.id, id) &&
+            other is _$ArtDetailImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.objectNumber, objectNumber) ||
+                other.objectNumber == objectNumber) &&
+            const DeepCollectionEquality().equals(other._colors, _colors) &&
             const DeepCollectionEquality()
-                .equals(other.objectNumber, objectNumber) &&
-            const DeepCollectionEquality().equals(other.colors, colors) &&
+                .equals(other._normalizedColors, _normalizedColors) &&
+            (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality().equals(other._titles, _titles) &&
+            (identical(other.longTitle, longTitle) ||
+                other.longTitle == longTitle) &&
+            (identical(other.subTitle, subTitle) ||
+                other.subTitle == subTitle) &&
+            (identical(other.scLabelLine, scLabelLine) ||
+                other.scLabelLine == scLabelLine) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             const DeepCollectionEquality()
-                .equals(other.normalizedColors, normalizedColors) &&
-            const DeepCollectionEquality().equals(other.title, title) &&
-            const DeepCollectionEquality().equals(other.titles, titles) &&
-            const DeepCollectionEquality().equals(other.longTitle, longTitle) &&
-            const DeepCollectionEquality().equals(other.subTitle, subTitle) &&
+                .equals(other._objectTypes, _objectTypes) &&
             const DeepCollectionEquality()
-                .equals(other.scLabelLine, scLabelLine) &&
-            const DeepCollectionEquality().equals(other.label, label) &&
+                .equals(other._objectCollection, _objectCollection) &&
+            (identical(other.principalMaker, principalMaker) ||
+                other.principalMaker == principalMaker) &&
+            (identical(other.principalOrFirstMaker, principalOrFirstMaker) ||
+                other.principalOrFirstMaker == principalOrFirstMaker) &&
             const DeepCollectionEquality()
-                .equals(other.description, description) &&
+                .equals(other._principalMakers, _principalMakers) &&
+            (identical(
+                    other.plaqueDescriptionEnglish, plaqueDescriptionEnglish) ||
+                other.plaqueDescriptionEnglish == plaqueDescriptionEnglish) &&
             const DeepCollectionEquality()
-                .equals(other.objectTypes, objectTypes) &&
+                .equals(other._materials, _materials) &&
             const DeepCollectionEquality()
-                .equals(other.objectCollection, objectCollection) &&
+                .equals(other._productionPlaces, _productionPlaces) &&
             const DeepCollectionEquality()
-                .equals(other.principalMaker, principalMaker) &&
+                .equals(other._techniques, _techniques) &&
             const DeepCollectionEquality()
-                .equals(other.principalOrFirstMaker, principalOrFirstMaker) &&
+                .equals(other._physicalProperties, _physicalProperties) &&
+            (identical(other.hasImage, hasImage) ||
+                other.hasImage == hasImage) &&
+            (identical(other.showImage, showImage) ||
+                other.showImage == showImage) &&
             const DeepCollectionEquality()
-                .equals(other.principalMakers, principalMakers) &&
-            const DeepCollectionEquality().equals(
-                other.plaqueDescriptionEnglish, plaqueDescriptionEnglish) &&
-            const DeepCollectionEquality().equals(other.materials, materials) &&
+                .equals(other._historicalPersons, _historicalPersons) &&
             const DeepCollectionEquality()
-                .equals(other.productionPlaces, productionPlaces) &&
+                .equals(other._documentation, _documentation) &&
             const DeepCollectionEquality()
-                .equals(other.techniques, techniques) &&
+                .equals(other._dimensions, _dimensions) &&
+            (identical(other.physicalMedium, physicalMedium) ||
+                other.physicalMedium == physicalMedium) &&
+            (identical(other.webImage, webImage) ||
+                other.webImage == webImage) &&
+            (identical(other.dating, dating) || other.dating == dating) &&
             const DeepCollectionEquality()
-                .equals(other.physicalProperties, physicalProperties) &&
-            const DeepCollectionEquality().equals(other.hasImage, hasImage) &&
-            const DeepCollectionEquality().equals(other.showImage, showImage) &&
-            const DeepCollectionEquality()
-                .equals(other.historicalPersons, historicalPersons) &&
-            const DeepCollectionEquality()
-                .equals(other.documentation, documentation) &&
-            const DeepCollectionEquality()
-                .equals(other.dimensions, dimensions) &&
-            const DeepCollectionEquality()
-                .equals(other.physicalMedium, physicalMedium) &&
-            const DeepCollectionEquality().equals(other.webImage, webImage) &&
-            const DeepCollectionEquality().equals(other.dating, dating));
+                .equals(other._inscriptions, _inscriptions) &&
+            (identical(other.galleryLocation, galleryLocation) ||
+                other.galleryLocation == galleryLocation) &&
+            (identical(other.onDisplay, onDisplay) ||
+                other.onDisplay == onDisplay));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
-        const DeepCollectionEquality().hash(id),
-        const DeepCollectionEquality().hash(objectNumber),
-        const DeepCollectionEquality().hash(colors),
-        const DeepCollectionEquality().hash(normalizedColors),
-        const DeepCollectionEquality().hash(title),
-        const DeepCollectionEquality().hash(titles),
-        const DeepCollectionEquality().hash(longTitle),
-        const DeepCollectionEquality().hash(subTitle),
-        const DeepCollectionEquality().hash(scLabelLine),
-        const DeepCollectionEquality().hash(label),
-        const DeepCollectionEquality().hash(description),
-        const DeepCollectionEquality().hash(objectTypes),
-        const DeepCollectionEquality().hash(objectCollection),
-        const DeepCollectionEquality().hash(principalMaker),
-        const DeepCollectionEquality().hash(principalOrFirstMaker),
-        const DeepCollectionEquality().hash(principalMakers),
-        const DeepCollectionEquality().hash(plaqueDescriptionEnglish),
-        const DeepCollectionEquality().hash(materials),
-        const DeepCollectionEquality().hash(productionPlaces),
-        const DeepCollectionEquality().hash(techniques),
-        const DeepCollectionEquality().hash(physicalProperties),
-        const DeepCollectionEquality().hash(hasImage),
-        const DeepCollectionEquality().hash(showImage),
-        const DeepCollectionEquality().hash(historicalPersons),
-        const DeepCollectionEquality().hash(documentation),
-        const DeepCollectionEquality().hash(dimensions),
-        const DeepCollectionEquality().hash(physicalMedium),
-        const DeepCollectionEquality().hash(webImage),
-        const DeepCollectionEquality().hash(dating)
+        id,
+        objectNumber,
+        const DeepCollectionEquality().hash(_colors),
+        const DeepCollectionEquality().hash(_normalizedColors),
+        title,
+        const DeepCollectionEquality().hash(_titles),
+        longTitle,
+        subTitle,
+        scLabelLine,
+        label,
+        description,
+        const DeepCollectionEquality().hash(_objectTypes),
+        const DeepCollectionEquality().hash(_objectCollection),
+        principalMaker,
+        principalOrFirstMaker,
+        const DeepCollectionEquality().hash(_principalMakers),
+        plaqueDescriptionEnglish,
+        const DeepCollectionEquality().hash(_materials),
+        const DeepCollectionEquality().hash(_productionPlaces),
+        const DeepCollectionEquality().hash(_techniques),
+        const DeepCollectionEquality().hash(_physicalProperties),
+        hasImage,
+        showImage,
+        const DeepCollectionEquality().hash(_historicalPersons),
+        const DeepCollectionEquality().hash(_documentation),
+        const DeepCollectionEquality().hash(_dimensions),
+        physicalMedium,
+        webImage,
+        dating,
+        const DeepCollectionEquality().hash(_inscriptions),
+        galleryLocation,
+        onDisplay
       ]);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtDetailCopyWith<_ArtDetail> get copyWith =>
-      __$ArtDetailCopyWithImpl<_ArtDetail>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtDetailImplCopyWith<_$ArtDetailImpl> get copyWith =>
+      __$$ArtDetailImplCopyWithImpl<_$ArtDetailImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtDetailToJson(this);
+    return _$$ArtDetailImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtDetail implements ArtDetail {
   const factory _ArtDetail(
-      {required String id,
-      required String objectNumber,
-      required List<ArtColor> colors,
-      required List<ArtColor> normalizedColors,
-      required String title,
-      required List<String> titles,
-      required String longTitle,
-      required String subTitle,
-      required String scLabelLine,
-      required ArtLabel label,
-      String? description,
-      required List<String> objectTypes,
-      required List<String> objectCollection,
-      required String principalMaker,
-      required String principalOrFirstMaker,
-      required List<ArtMaker> principalMakers,
-      String? plaqueDescriptionEnglish,
-      required List<String> materials,
-      required List<String> productionPlaces,
-      required List<String> techniques,
-      required List<String> physicalProperties,
-      required bool hasImage,
-      required bool showImage,
-      required List<String> historicalPersons,
-      required List<String> documentation,
-      required List<ArtDimension> dimensions,
-      String? physicalMedium,
-      ArtImage? webImage,
-      required ArtDating dating}) = _$_ArtDetail;
+      {required final String id,
+      required final String objectNumber,
+      required final List<ArtColor> colors,
+      required final List<ArtColor> normalizedColors,
+      required final String title,
+      required final List<String> titles,
+      required final String longTitle,
+      required final String subTitle,
+      required final String scLabelLine,
+      required final ArtLabel label,
+      final String? description,
+      required final List<String> objectTypes,
+      required final List<String> objectCollection,
+      required final String principalMaker,
+      required final String principalOrFirstMaker,
+      required final List<ArtMaker> principalMakers,
+      final String? plaqueDescriptionEnglish,
+      required final List<String> materials,
+      required final List<String> productionPlaces,
+      required final List<String> techniques,
+      required final List<String> physicalProperties,
+      required final bool hasImage,
+      required final bool showImage,
+      required final List<String> historicalPersons,
+      required final List<String> documentation,
+      required final List<ArtDimension> dimensions,
+      final String? physicalMedium,
+      final ArtImage? webImage,
+      required final ArtDating dating,
+      required final List<String> inscriptions,
+      final String? galleryLocation,
+      required final bool onDisplay}) = _$ArtDetailImpl;
 
   factory _ArtDetail.fromJson(Map<String, dynamic> json) =
-      _$_ArtDetail.fromJson;
+      _$ArtDetailImpl.fromJson;
 
   @override
   String get id;
@@ -1251,8 +1373,17 @@ abstract class _ArtDetail implements ArtDetail {
   @override
   ArtDating get dating;
   @override
-  @JsonKey(ignore: true)
-  _$ArtDetailCopyWith<_ArtDetail> get copyWith =>
+  List<String> get inscriptions;
+  @override
+  String? get galleryLocation;
+  @override
+  bool get onDisplay;
+
+  /// Create a copy of ArtDetail
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtDetailImplCopyWith<_$ArtDetailImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1261,31 +1392,16 @@ ArtColor _$ArtColorFromJson(Map<String, dynamic> json) {
 }
 
 /// @nodoc
-class _$ArtColorTearOff {
-  const _$ArtColorTearOff();
-
-  _ArtColor call({required double percentage, required String hex}) {
-    return _ArtColor(
-      percentage: percentage,
-      hex: hex,
-    );
-  }
-
-  ArtColor fromJson(Map<String, Object?> json) {
-    return ArtColor.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtColor = _$ArtColorTearOff();
-
-/// @nodoc
 mixin _$ArtColor {
   double get percentage => throw _privateConstructorUsedError;
   String get hex => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtColor to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtColor
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtColorCopyWith<ArtColor> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1293,64 +1409,75 @@ mixin _$ArtColor {
 /// @nodoc
 abstract class $ArtColorCopyWith<$Res> {
   factory $ArtColorCopyWith(ArtColor value, $Res Function(ArtColor) then) =
-      _$ArtColorCopyWithImpl<$Res>;
+      _$ArtColorCopyWithImpl<$Res, ArtColor>;
+  @useResult
   $Res call({double percentage, String hex});
 }
 
 /// @nodoc
-class _$ArtColorCopyWithImpl<$Res> implements $ArtColorCopyWith<$Res> {
+class _$ArtColorCopyWithImpl<$Res, $Val extends ArtColor>
+    implements $ArtColorCopyWith<$Res> {
   _$ArtColorCopyWithImpl(this._value, this._then);
 
-  final ArtColor _value;
   // ignore: unused_field
-  final $Res Function(ArtColor) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtColor
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? percentage = freezed,
-    Object? hex = freezed,
+    Object? percentage = null,
+    Object? hex = null,
   }) {
     return _then(_value.copyWith(
-      percentage: percentage == freezed
+      percentage: null == percentage
           ? _value.percentage
           : percentage // ignore: cast_nullable_to_non_nullable
               as double,
-      hex: hex == freezed
+      hex: null == hex
           ? _value.hex
           : hex // ignore: cast_nullable_to_non_nullable
               as String,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtColorCopyWith<$Res> implements $ArtColorCopyWith<$Res> {
-  factory _$ArtColorCopyWith(_ArtColor value, $Res Function(_ArtColor) then) =
-      __$ArtColorCopyWithImpl<$Res>;
+abstract class _$$ArtColorImplCopyWith<$Res>
+    implements $ArtColorCopyWith<$Res> {
+  factory _$$ArtColorImplCopyWith(
+          _$ArtColorImpl value, $Res Function(_$ArtColorImpl) then) =
+      __$$ArtColorImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({double percentage, String hex});
 }
 
 /// @nodoc
-class __$ArtColorCopyWithImpl<$Res> extends _$ArtColorCopyWithImpl<$Res>
-    implements _$ArtColorCopyWith<$Res> {
-  __$ArtColorCopyWithImpl(_ArtColor _value, $Res Function(_ArtColor) _then)
-      : super(_value, (v) => _then(v as _ArtColor));
+class __$$ArtColorImplCopyWithImpl<$Res>
+    extends _$ArtColorCopyWithImpl<$Res, _$ArtColorImpl>
+    implements _$$ArtColorImplCopyWith<$Res> {
+  __$$ArtColorImplCopyWithImpl(
+      _$ArtColorImpl _value, $Res Function(_$ArtColorImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtColor get _value => super._value as _ArtColor;
-
+  /// Create a copy of ArtColor
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? percentage = freezed,
-    Object? hex = freezed,
+    Object? percentage = null,
+    Object? hex = null,
   }) {
-    return _then(_ArtColor(
-      percentage: percentage == freezed
+    return _then(_$ArtColorImpl(
+      percentage: null == percentage
           ? _value.percentage
           : percentage // ignore: cast_nullable_to_non_nullable
               as double,
-      hex: hex == freezed
+      hex: null == hex
           ? _value.hex
           : hex // ignore: cast_nullable_to_non_nullable
               as String,
@@ -1360,11 +1487,11 @@ class __$ArtColorCopyWithImpl<$Res> extends _$ArtColorCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtColor implements _ArtColor {
-  const _$_ArtColor({required this.percentage, required this.hex});
+class _$ArtColorImpl implements _ArtColor {
+  const _$ArtColorImpl({required this.percentage, required this.hex});
 
-  factory _$_ArtColor.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtColorFromJson(json);
+  factory _$ArtColorImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtColorImplFromJson(json);
 
   @override
   final double percentage;
@@ -1377,78 +1504,59 @@ class _$_ArtColor implements _ArtColor {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtColor &&
-            const DeepCollectionEquality()
-                .equals(other.percentage, percentage) &&
-            const DeepCollectionEquality().equals(other.hex, hex));
+            other is _$ArtColorImpl &&
+            (identical(other.percentage, percentage) ||
+                other.percentage == percentage) &&
+            (identical(other.hex, hex) || other.hex == hex));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(percentage),
-      const DeepCollectionEquality().hash(hex));
+  int get hashCode => Object.hash(runtimeType, percentage, hex);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtColor
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtColorCopyWith<_ArtColor> get copyWith =>
-      __$ArtColorCopyWithImpl<_ArtColor>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtColorImplCopyWith<_$ArtColorImpl> get copyWith =>
+      __$$ArtColorImplCopyWithImpl<_$ArtColorImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtColorToJson(this);
+    return _$$ArtColorImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtColor implements ArtColor {
-  const factory _ArtColor({required double percentage, required String hex}) =
-      _$_ArtColor;
+  const factory _ArtColor(
+      {required final double percentage,
+      required final String hex}) = _$ArtColorImpl;
 
-  factory _ArtColor.fromJson(Map<String, dynamic> json) = _$_ArtColor.fromJson;
+  factory _ArtColor.fromJson(Map<String, dynamic> json) =
+      _$ArtColorImpl.fromJson;
 
   @override
   double get percentage;
   @override
   String get hex;
+
+  /// Create a copy of ArtColor
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtColorCopyWith<_ArtColor> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtColorImplCopyWith<_$ArtColorImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 ArtDating _$ArtDatingFromJson(Map<String, dynamic> json) {
   return _ArtDating.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtDatingTearOff {
-  const _$ArtDatingTearOff();
-
-  _ArtDating call(
-      {required String presentingDate,
-      required int sortingDate,
-      required int period,
-      required int yearEarly,
-      required int yearLate}) {
-    return _ArtDating(
-      presentingDate: presentingDate,
-      sortingDate: sortingDate,
-      period: period,
-      yearEarly: yearEarly,
-      yearLate: yearLate,
-    );
-  }
-
-  ArtDating fromJson(Map<String, Object?> json) {
-    return ArtDating.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtDating = _$ArtDatingTearOff();
 
 /// @nodoc
 mixin _$ArtDating {
@@ -1458,8 +1566,12 @@ mixin _$ArtDating {
   int get yearEarly => throw _privateConstructorUsedError;
   int get yearLate => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtDating to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtDating
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtDatingCopyWith<ArtDating> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1467,7 +1579,8 @@ mixin _$ArtDating {
 /// @nodoc
 abstract class $ArtDatingCopyWith<$Res> {
   factory $ArtDatingCopyWith(ArtDating value, $Res Function(ArtDating) then) =
-      _$ArtDatingCopyWithImpl<$Res>;
+      _$ArtDatingCopyWithImpl<$Res, ArtDating>;
+  @useResult
   $Res call(
       {String presentingDate,
       int sortingDate,
@@ -1477,52 +1590,59 @@ abstract class $ArtDatingCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtDatingCopyWithImpl<$Res> implements $ArtDatingCopyWith<$Res> {
+class _$ArtDatingCopyWithImpl<$Res, $Val extends ArtDating>
+    implements $ArtDatingCopyWith<$Res> {
   _$ArtDatingCopyWithImpl(this._value, this._then);
 
-  final ArtDating _value;
   // ignore: unused_field
-  final $Res Function(ArtDating) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtDating
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? presentingDate = freezed,
-    Object? sortingDate = freezed,
-    Object? period = freezed,
-    Object? yearEarly = freezed,
-    Object? yearLate = freezed,
+    Object? presentingDate = null,
+    Object? sortingDate = null,
+    Object? period = null,
+    Object? yearEarly = null,
+    Object? yearLate = null,
   }) {
     return _then(_value.copyWith(
-      presentingDate: presentingDate == freezed
+      presentingDate: null == presentingDate
           ? _value.presentingDate
           : presentingDate // ignore: cast_nullable_to_non_nullable
               as String,
-      sortingDate: sortingDate == freezed
+      sortingDate: null == sortingDate
           ? _value.sortingDate
           : sortingDate // ignore: cast_nullable_to_non_nullable
               as int,
-      period: period == freezed
+      period: null == period
           ? _value.period
           : period // ignore: cast_nullable_to_non_nullable
               as int,
-      yearEarly: yearEarly == freezed
+      yearEarly: null == yearEarly
           ? _value.yearEarly
           : yearEarly // ignore: cast_nullable_to_non_nullable
               as int,
-      yearLate: yearLate == freezed
+      yearLate: null == yearLate
           ? _value.yearLate
           : yearLate // ignore: cast_nullable_to_non_nullable
               as int,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtDatingCopyWith<$Res> implements $ArtDatingCopyWith<$Res> {
-  factory _$ArtDatingCopyWith(
-          _ArtDating value, $Res Function(_ArtDating) then) =
-      __$ArtDatingCopyWithImpl<$Res>;
+abstract class _$$ArtDatingImplCopyWith<$Res>
+    implements $ArtDatingCopyWith<$Res> {
+  factory _$$ArtDatingImplCopyWith(
+          _$ArtDatingImpl value, $Res Function(_$ArtDatingImpl) then) =
+      __$$ArtDatingImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String presentingDate,
       int sortingDate,
@@ -1532,40 +1652,42 @@ abstract class _$ArtDatingCopyWith<$Res> implements $ArtDatingCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ArtDatingCopyWithImpl<$Res> extends _$ArtDatingCopyWithImpl<$Res>
-    implements _$ArtDatingCopyWith<$Res> {
-  __$ArtDatingCopyWithImpl(_ArtDating _value, $Res Function(_ArtDating) _then)
-      : super(_value, (v) => _then(v as _ArtDating));
+class __$$ArtDatingImplCopyWithImpl<$Res>
+    extends _$ArtDatingCopyWithImpl<$Res, _$ArtDatingImpl>
+    implements _$$ArtDatingImplCopyWith<$Res> {
+  __$$ArtDatingImplCopyWithImpl(
+      _$ArtDatingImpl _value, $Res Function(_$ArtDatingImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtDating get _value => super._value as _ArtDating;
-
+  /// Create a copy of ArtDating
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? presentingDate = freezed,
-    Object? sortingDate = freezed,
-    Object? period = freezed,
-    Object? yearEarly = freezed,
-    Object? yearLate = freezed,
+    Object? presentingDate = null,
+    Object? sortingDate = null,
+    Object? period = null,
+    Object? yearEarly = null,
+    Object? yearLate = null,
   }) {
-    return _then(_ArtDating(
-      presentingDate: presentingDate == freezed
+    return _then(_$ArtDatingImpl(
+      presentingDate: null == presentingDate
           ? _value.presentingDate
           : presentingDate // ignore: cast_nullable_to_non_nullable
               as String,
-      sortingDate: sortingDate == freezed
+      sortingDate: null == sortingDate
           ? _value.sortingDate
           : sortingDate // ignore: cast_nullable_to_non_nullable
               as int,
-      period: period == freezed
+      period: null == period
           ? _value.period
           : period // ignore: cast_nullable_to_non_nullable
               as int,
-      yearEarly: yearEarly == freezed
+      yearEarly: null == yearEarly
           ? _value.yearEarly
           : yearEarly // ignore: cast_nullable_to_non_nullable
               as int,
-      yearLate: yearLate == freezed
+      yearLate: null == yearLate
           ? _value.yearLate
           : yearLate // ignore: cast_nullable_to_non_nullable
               as int,
@@ -1575,16 +1697,16 @@ class __$ArtDatingCopyWithImpl<$Res> extends _$ArtDatingCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtDating implements _ArtDating {
-  const _$_ArtDating(
+class _$ArtDatingImpl implements _ArtDating {
+  const _$ArtDatingImpl(
       {required this.presentingDate,
       required this.sortingDate,
       required this.period,
       required this.yearEarly,
       required this.yearLate});
 
-  factory _$_ArtDating.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtDatingFromJson(json);
+  factory _$ArtDatingImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtDatingImplFromJson(json);
 
   @override
   final String presentingDate;
@@ -1603,49 +1725,52 @@ class _$_ArtDating implements _ArtDating {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtDating &&
-            const DeepCollectionEquality()
-                .equals(other.presentingDate, presentingDate) &&
-            const DeepCollectionEquality()
-                .equals(other.sortingDate, sortingDate) &&
-            const DeepCollectionEquality().equals(other.period, period) &&
-            const DeepCollectionEquality().equals(other.yearEarly, yearEarly) &&
-            const DeepCollectionEquality().equals(other.yearLate, yearLate));
+            other is _$ArtDatingImpl &&
+            (identical(other.presentingDate, presentingDate) ||
+                other.presentingDate == presentingDate) &&
+            (identical(other.sortingDate, sortingDate) ||
+                other.sortingDate == sortingDate) &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.yearEarly, yearEarly) ||
+                other.yearEarly == yearEarly) &&
+            (identical(other.yearLate, yearLate) ||
+                other.yearLate == yearLate));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(presentingDate),
-      const DeepCollectionEquality().hash(sortingDate),
-      const DeepCollectionEquality().hash(period),
-      const DeepCollectionEquality().hash(yearEarly),
-      const DeepCollectionEquality().hash(yearLate));
+      runtimeType, presentingDate, sortingDate, period, yearEarly, yearLate);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtDating
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtDatingCopyWith<_ArtDating> get copyWith =>
-      __$ArtDatingCopyWithImpl<_ArtDating>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtDatingImplCopyWith<_$ArtDatingImpl> get copyWith =>
+      __$$ArtDatingImplCopyWithImpl<_$ArtDatingImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtDatingToJson(this);
+    return _$$ArtDatingImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtDating implements ArtDating {
   const factory _ArtDating(
-      {required String presentingDate,
-      required int sortingDate,
-      required int period,
-      required int yearEarly,
-      required int yearLate}) = _$_ArtDating;
+      {required final String presentingDate,
+      required final int sortingDate,
+      required final int period,
+      required final int yearEarly,
+      required final int yearLate}) = _$ArtDatingImpl;
 
   factory _ArtDating.fromJson(Map<String, dynamic> json) =
-      _$_ArtDating.fromJson;
+      _$ArtDatingImpl.fromJson;
 
   @override
   String get presentingDate;
@@ -1657,40 +1782,18 @@ abstract class _ArtDating implements ArtDating {
   int get yearEarly;
   @override
   int get yearLate;
+
+  /// Create a copy of ArtDating
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtDatingCopyWith<_ArtDating> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtDatingImplCopyWith<_$ArtDatingImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 ArtDimension _$ArtDimensionFromJson(Map<String, dynamic> json) {
   return _ArtDimension.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtDimensionTearOff {
-  const _$ArtDimensionTearOff();
-
-  _ArtDimension call(
-      {required String unit,
-      String? type,
-      @JsonKey(fromJson: stringToDoubleParser) required double value,
-      String? part}) {
-    return _ArtDimension(
-      unit: unit,
-      type: type,
-      value: value,
-      part: part,
-    );
-  }
-
-  ArtDimension fromJson(Map<String, Object?> json) {
-    return ArtDimension.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtDimension = _$ArtDimensionTearOff();
 
 /// @nodoc
 mixin _$ArtDimension {
@@ -1700,8 +1803,12 @@ mixin _$ArtDimension {
   double get value => throw _privateConstructorUsedError;
   String? get part => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtDimension to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtDimension
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtDimensionCopyWith<ArtDimension> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1710,7 +1817,8 @@ mixin _$ArtDimension {
 abstract class $ArtDimensionCopyWith<$Res> {
   factory $ArtDimensionCopyWith(
           ArtDimension value, $Res Function(ArtDimension) then) =
-      _$ArtDimensionCopyWithImpl<$Res>;
+      _$ArtDimensionCopyWithImpl<$Res, ArtDimension>;
+  @useResult
   $Res call(
       {String unit,
       String? type,
@@ -1719,48 +1827,54 @@ abstract class $ArtDimensionCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtDimensionCopyWithImpl<$Res> implements $ArtDimensionCopyWith<$Res> {
+class _$ArtDimensionCopyWithImpl<$Res, $Val extends ArtDimension>
+    implements $ArtDimensionCopyWith<$Res> {
   _$ArtDimensionCopyWithImpl(this._value, this._then);
 
-  final ArtDimension _value;
   // ignore: unused_field
-  final $Res Function(ArtDimension) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtDimension
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? unit = freezed,
+    Object? unit = null,
     Object? type = freezed,
-    Object? value = freezed,
+    Object? value = null,
     Object? part = freezed,
   }) {
     return _then(_value.copyWith(
-      unit: unit == freezed
+      unit: null == unit
           ? _value.unit
           : unit // ignore: cast_nullable_to_non_nullable
               as String,
-      type: type == freezed
+      type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as String?,
-      value: value == freezed
+      value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as double,
-      part: part == freezed
+      part: freezed == part
           ? _value.part
           : part // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtDimensionCopyWith<$Res>
+abstract class _$$ArtDimensionImplCopyWith<$Res>
     implements $ArtDimensionCopyWith<$Res> {
-  factory _$ArtDimensionCopyWith(
-          _ArtDimension value, $Res Function(_ArtDimension) then) =
-      __$ArtDimensionCopyWithImpl<$Res>;
+  factory _$$ArtDimensionImplCopyWith(
+          _$ArtDimensionImpl value, $Res Function(_$ArtDimensionImpl) then) =
+      __$$ArtDimensionImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String unit,
       String? type,
@@ -1769,36 +1883,37 @@ abstract class _$ArtDimensionCopyWith<$Res>
 }
 
 /// @nodoc
-class __$ArtDimensionCopyWithImpl<$Res> extends _$ArtDimensionCopyWithImpl<$Res>
-    implements _$ArtDimensionCopyWith<$Res> {
-  __$ArtDimensionCopyWithImpl(
-      _ArtDimension _value, $Res Function(_ArtDimension) _then)
-      : super(_value, (v) => _then(v as _ArtDimension));
+class __$$ArtDimensionImplCopyWithImpl<$Res>
+    extends _$ArtDimensionCopyWithImpl<$Res, _$ArtDimensionImpl>
+    implements _$$ArtDimensionImplCopyWith<$Res> {
+  __$$ArtDimensionImplCopyWithImpl(
+      _$ArtDimensionImpl _value, $Res Function(_$ArtDimensionImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtDimension get _value => super._value as _ArtDimension;
-
+  /// Create a copy of ArtDimension
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? unit = freezed,
+    Object? unit = null,
     Object? type = freezed,
-    Object? value = freezed,
+    Object? value = null,
     Object? part = freezed,
   }) {
-    return _then(_ArtDimension(
-      unit: unit == freezed
+    return _then(_$ArtDimensionImpl(
+      unit: null == unit
           ? _value.unit
           : unit // ignore: cast_nullable_to_non_nullable
               as String,
-      type: type == freezed
+      type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as String?,
-      value: value == freezed
+      value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as double,
-      part: part == freezed
+      part: freezed == part
           ? _value.part
           : part // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -1808,15 +1923,15 @@ class __$ArtDimensionCopyWithImpl<$Res> extends _$ArtDimensionCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtDimension implements _ArtDimension {
-  const _$_ArtDimension(
+class _$ArtDimensionImpl implements _ArtDimension {
+  const _$ArtDimensionImpl(
       {required this.unit,
       this.type,
       @JsonKey(fromJson: stringToDoubleParser) required this.value,
       this.part});
 
-  factory _$_ArtDimension.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtDimensionFromJson(json);
+  factory _$ArtDimensionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtDimensionImplFromJson(json);
 
   @override
   final String unit;
@@ -1834,44 +1949,45 @@ class _$_ArtDimension implements _ArtDimension {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtDimension &&
-            const DeepCollectionEquality().equals(other.unit, unit) &&
-            const DeepCollectionEquality().equals(other.type, type) &&
-            const DeepCollectionEquality().equals(other.value, value) &&
-            const DeepCollectionEquality().equals(other.part, part));
+            other is _$ArtDimensionImpl &&
+            (identical(other.unit, unit) || other.unit == unit) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.value, value) || other.value == value) &&
+            (identical(other.part, part) || other.part == part));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(unit),
-      const DeepCollectionEquality().hash(type),
-      const DeepCollectionEquality().hash(value),
-      const DeepCollectionEquality().hash(part));
+  int get hashCode => Object.hash(runtimeType, unit, type, value, part);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtDimension
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtDimensionCopyWith<_ArtDimension> get copyWith =>
-      __$ArtDimensionCopyWithImpl<_ArtDimension>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtDimensionImplCopyWith<_$ArtDimensionImpl> get copyWith =>
+      __$$ArtDimensionImplCopyWithImpl<_$ArtDimensionImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtDimensionToJson(this);
+    return _$$ArtDimensionImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtDimension implements ArtDimension {
   const factory _ArtDimension(
-      {required String unit,
-      String? type,
-      @JsonKey(fromJson: stringToDoubleParser) required double value,
-      String? part}) = _$_ArtDimension;
+      {required final String unit,
+      final String? type,
+      @JsonKey(fromJson: stringToDoubleParser) required final double value,
+      final String? part}) = _$ArtDimensionImpl;
 
   factory _ArtDimension.fromJson(Map<String, dynamic> json) =
-      _$_ArtDimension.fromJson;
+      _$ArtDimensionImpl.fromJson;
 
   @override
   String get unit;
@@ -1882,42 +1998,18 @@ abstract class _ArtDimension implements ArtDimension {
   double get value;
   @override
   String? get part;
+
+  /// Create a copy of ArtDimension
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtDimensionCopyWith<_ArtDimension> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtDimensionImplCopyWith<_$ArtDimensionImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 ArtLabel _$ArtLabelFromJson(Map<String, dynamic> json) {
   return _ArtLabel.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtLabelTearOff {
-  const _$ArtLabelTearOff();
-
-  _ArtLabel call(
-      {String? title,
-      String? makerLine,
-      String? description,
-      String? notes,
-      DateTime? date}) {
-    return _ArtLabel(
-      title: title,
-      makerLine: makerLine,
-      description: description,
-      notes: notes,
-      date: date,
-    );
-  }
-
-  ArtLabel fromJson(Map<String, Object?> json) {
-    return ArtLabel.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtLabel = _$ArtLabelTearOff();
 
 /// @nodoc
 mixin _$ArtLabel {
@@ -1927,8 +2019,12 @@ mixin _$ArtLabel {
   String? get notes => throw _privateConstructorUsedError;
   DateTime? get date => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtLabel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtLabel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtLabelCopyWith<ArtLabel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1936,7 +2032,8 @@ mixin _$ArtLabel {
 /// @nodoc
 abstract class $ArtLabelCopyWith<$Res> {
   factory $ArtLabelCopyWith(ArtLabel value, $Res Function(ArtLabel) then) =
-      _$ArtLabelCopyWithImpl<$Res>;
+      _$ArtLabelCopyWithImpl<$Res, ArtLabel>;
+  @useResult
   $Res call(
       {String? title,
       String? makerLine,
@@ -1946,13 +2043,18 @@ abstract class $ArtLabelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtLabelCopyWithImpl<$Res> implements $ArtLabelCopyWith<$Res> {
+class _$ArtLabelCopyWithImpl<$Res, $Val extends ArtLabel>
+    implements $ArtLabelCopyWith<$Res> {
   _$ArtLabelCopyWithImpl(this._value, this._then);
 
-  final ArtLabel _value;
   // ignore: unused_field
-  final $Res Function(ArtLabel) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtLabel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = freezed,
@@ -1962,35 +2064,38 @@ class _$ArtLabelCopyWithImpl<$Res> implements $ArtLabelCopyWith<$Res> {
     Object? date = freezed,
   }) {
     return _then(_value.copyWith(
-      title: title == freezed
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      makerLine: makerLine == freezed
+      makerLine: freezed == makerLine
           ? _value.makerLine
           : makerLine // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      notes: notes == freezed
+      notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      date: date == freezed
+      date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtLabelCopyWith<$Res> implements $ArtLabelCopyWith<$Res> {
-  factory _$ArtLabelCopyWith(_ArtLabel value, $Res Function(_ArtLabel) then) =
-      __$ArtLabelCopyWithImpl<$Res>;
+abstract class _$$ArtLabelImplCopyWith<$Res>
+    implements $ArtLabelCopyWith<$Res> {
+  factory _$$ArtLabelImplCopyWith(
+          _$ArtLabelImpl value, $Res Function(_$ArtLabelImpl) then) =
+      __$$ArtLabelImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String? title,
       String? makerLine,
@@ -2000,14 +2105,16 @@ abstract class _$ArtLabelCopyWith<$Res> implements $ArtLabelCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ArtLabelCopyWithImpl<$Res> extends _$ArtLabelCopyWithImpl<$Res>
-    implements _$ArtLabelCopyWith<$Res> {
-  __$ArtLabelCopyWithImpl(_ArtLabel _value, $Res Function(_ArtLabel) _then)
-      : super(_value, (v) => _then(v as _ArtLabel));
+class __$$ArtLabelImplCopyWithImpl<$Res>
+    extends _$ArtLabelCopyWithImpl<$Res, _$ArtLabelImpl>
+    implements _$$ArtLabelImplCopyWith<$Res> {
+  __$$ArtLabelImplCopyWithImpl(
+      _$ArtLabelImpl _value, $Res Function(_$ArtLabelImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtLabel get _value => super._value as _ArtLabel;
-
+  /// Create a copy of ArtLabel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = freezed,
@@ -2016,24 +2123,24 @@ class __$ArtLabelCopyWithImpl<$Res> extends _$ArtLabelCopyWithImpl<$Res>
     Object? notes = freezed,
     Object? date = freezed,
   }) {
-    return _then(_ArtLabel(
-      title: title == freezed
+    return _then(_$ArtLabelImpl(
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      makerLine: makerLine == freezed
+      makerLine: freezed == makerLine
           ? _value.makerLine
           : makerLine // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      notes: notes == freezed
+      notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      date: date == freezed
+      date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime?,
@@ -2043,12 +2150,12 @@ class __$ArtLabelCopyWithImpl<$Res> extends _$ArtLabelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtLabel implements _ArtLabel {
-  const _$_ArtLabel(
+class _$ArtLabelImpl implements _ArtLabel {
+  const _$ArtLabelImpl(
       {this.title, this.makerLine, this.description, this.notes, this.date});
 
-  factory _$_ArtLabel.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtLabelFromJson(json);
+  factory _$ArtLabelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtLabelImplFromJson(json);
 
   @override
   final String? title;
@@ -2067,47 +2174,50 @@ class _$_ArtLabel implements _ArtLabel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtLabel &&
-            const DeepCollectionEquality().equals(other.title, title) &&
-            const DeepCollectionEquality().equals(other.makerLine, makerLine) &&
-            const DeepCollectionEquality()
-                .equals(other.description, description) &&
-            const DeepCollectionEquality().equals(other.notes, notes) &&
-            const DeepCollectionEquality().equals(other.date, date));
+            other is _$ArtLabelImpl &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.makerLine, makerLine) ||
+                other.makerLine == makerLine) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.date, date) || other.date == date));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(title),
-      const DeepCollectionEquality().hash(makerLine),
-      const DeepCollectionEquality().hash(description),
-      const DeepCollectionEquality().hash(notes),
-      const DeepCollectionEquality().hash(date));
+  int get hashCode =>
+      Object.hash(runtimeType, title, makerLine, description, notes, date);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtLabel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtLabelCopyWith<_ArtLabel> get copyWith =>
-      __$ArtLabelCopyWithImpl<_ArtLabel>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtLabelImplCopyWith<_$ArtLabelImpl> get copyWith =>
+      __$$ArtLabelImplCopyWithImpl<_$ArtLabelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtLabelToJson(this);
+    return _$$ArtLabelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtLabel implements ArtLabel {
   const factory _ArtLabel(
-      {String? title,
-      String? makerLine,
-      String? description,
-      String? notes,
-      DateTime? date}) = _$_ArtLabel;
+      {final String? title,
+      final String? makerLine,
+      final String? description,
+      final String? notes,
+      final DateTime? date}) = _$ArtLabelImpl;
 
-  factory _ArtLabel.fromJson(Map<String, dynamic> json) = _$_ArtLabel.fromJson;
+  factory _ArtLabel.fromJson(Map<String, dynamic> json) =
+      _$ArtLabelImpl.fromJson;
 
   @override
   String? get title;
@@ -2119,9 +2229,12 @@ abstract class _ArtLabel implements ArtLabel {
   String? get notes;
   @override
   DateTime? get date;
+
+  /// Create a copy of ArtLabel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtLabelCopyWith<_ArtLabel> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtLabelImplCopyWith<_$ArtLabelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2130,33 +2243,17 @@ ArtLinks _$ArtLinksFromJson(Map<String, dynamic> json) {
 }
 
 /// @nodoc
-class _$ArtLinksTearOff {
-  const _$ArtLinksTearOff();
-
-  _ArtLinks call({String? web, String? self, String? search}) {
-    return _ArtLinks(
-      web: web,
-      self: self,
-      search: search,
-    );
-  }
-
-  ArtLinks fromJson(Map<String, Object?> json) {
-    return ArtLinks.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtLinks = _$ArtLinksTearOff();
-
-/// @nodoc
 mixin _$ArtLinks {
   String? get web => throw _privateConstructorUsedError;
   String? get self => throw _privateConstructorUsedError;
   String? get search => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtLinks to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtLinks
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtLinksCopyWith<ArtLinks> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2164,18 +2261,24 @@ mixin _$ArtLinks {
 /// @nodoc
 abstract class $ArtLinksCopyWith<$Res> {
   factory $ArtLinksCopyWith(ArtLinks value, $Res Function(ArtLinks) then) =
-      _$ArtLinksCopyWithImpl<$Res>;
+      _$ArtLinksCopyWithImpl<$Res, ArtLinks>;
+  @useResult
   $Res call({String? web, String? self, String? search});
 }
 
 /// @nodoc
-class _$ArtLinksCopyWithImpl<$Res> implements $ArtLinksCopyWith<$Res> {
+class _$ArtLinksCopyWithImpl<$Res, $Val extends ArtLinks>
+    implements $ArtLinksCopyWith<$Res> {
   _$ArtLinksCopyWithImpl(this._value, this._then);
 
-  final ArtLinks _value;
   // ignore: unused_field
-  final $Res Function(ArtLinks) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtLinks
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? web = freezed,
@@ -2183,55 +2286,60 @@ class _$ArtLinksCopyWithImpl<$Res> implements $ArtLinksCopyWith<$Res> {
     Object? search = freezed,
   }) {
     return _then(_value.copyWith(
-      web: web == freezed
+      web: freezed == web
           ? _value.web
           : web // ignore: cast_nullable_to_non_nullable
               as String?,
-      self: self == freezed
+      self: freezed == self
           ? _value.self
           : self // ignore: cast_nullable_to_non_nullable
               as String?,
-      search: search == freezed
+      search: freezed == search
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtLinksCopyWith<$Res> implements $ArtLinksCopyWith<$Res> {
-  factory _$ArtLinksCopyWith(_ArtLinks value, $Res Function(_ArtLinks) then) =
-      __$ArtLinksCopyWithImpl<$Res>;
+abstract class _$$ArtLinksImplCopyWith<$Res>
+    implements $ArtLinksCopyWith<$Res> {
+  factory _$$ArtLinksImplCopyWith(
+          _$ArtLinksImpl value, $Res Function(_$ArtLinksImpl) then) =
+      __$$ArtLinksImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({String? web, String? self, String? search});
 }
 
 /// @nodoc
-class __$ArtLinksCopyWithImpl<$Res> extends _$ArtLinksCopyWithImpl<$Res>
-    implements _$ArtLinksCopyWith<$Res> {
-  __$ArtLinksCopyWithImpl(_ArtLinks _value, $Res Function(_ArtLinks) _then)
-      : super(_value, (v) => _then(v as _ArtLinks));
+class __$$ArtLinksImplCopyWithImpl<$Res>
+    extends _$ArtLinksCopyWithImpl<$Res, _$ArtLinksImpl>
+    implements _$$ArtLinksImplCopyWith<$Res> {
+  __$$ArtLinksImplCopyWithImpl(
+      _$ArtLinksImpl _value, $Res Function(_$ArtLinksImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtLinks get _value => super._value as _ArtLinks;
-
+  /// Create a copy of ArtLinks
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? web = freezed,
     Object? self = freezed,
     Object? search = freezed,
   }) {
-    return _then(_ArtLinks(
-      web: web == freezed
+    return _then(_$ArtLinksImpl(
+      web: freezed == web
           ? _value.web
           : web // ignore: cast_nullable_to_non_nullable
               as String?,
-      self: self == freezed
+      self: freezed == self
           ? _value.self
           : self // ignore: cast_nullable_to_non_nullable
               as String?,
-      search: search == freezed
+      search: freezed == search
           ? _value.search
           : search // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -2241,11 +2349,11 @@ class __$ArtLinksCopyWithImpl<$Res> extends _$ArtLinksCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtLinks implements _ArtLinks {
-  const _$_ArtLinks({this.web, this.self, this.search});
+class _$ArtLinksImpl implements _ArtLinks {
+  const _$ArtLinksImpl({this.web, this.self, this.search});
 
-  factory _$_ArtLinks.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtLinksFromJson(json);
+  factory _$ArtLinksImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtLinksImplFromJson(json);
 
   @override
   final String? web;
@@ -2260,38 +2368,43 @@ class _$_ArtLinks implements _ArtLinks {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtLinks &&
-            const DeepCollectionEquality().equals(other.web, web) &&
-            const DeepCollectionEquality().equals(other.self, self) &&
-            const DeepCollectionEquality().equals(other.search, search));
+            other is _$ArtLinksImpl &&
+            (identical(other.web, web) || other.web == web) &&
+            (identical(other.self, self) || other.self == self) &&
+            (identical(other.search, search) || other.search == search));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(web),
-      const DeepCollectionEquality().hash(self),
-      const DeepCollectionEquality().hash(search));
+  int get hashCode => Object.hash(runtimeType, web, self, search);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtLinks
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtLinksCopyWith<_ArtLinks> get copyWith =>
-      __$ArtLinksCopyWithImpl<_ArtLinks>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtLinksImplCopyWith<_$ArtLinksImpl> get copyWith =>
+      __$$ArtLinksImplCopyWithImpl<_$ArtLinksImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtLinksToJson(this);
+    return _$$ArtLinksImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtLinks implements ArtLinks {
-  const factory _ArtLinks({String? web, String? self, String? search}) =
-      _$_ArtLinks;
+  const factory _ArtLinks(
+      {final String? web,
+      final String? self,
+      final String? search}) = _$ArtLinksImpl;
 
-  factory _ArtLinks.fromJson(Map<String, dynamic> json) = _$_ArtLinks.fromJson;
+  factory _ArtLinks.fromJson(Map<String, dynamic> json) =
+      _$ArtLinksImpl.fromJson;
 
   @override
   String? get web;
@@ -2299,9 +2412,12 @@ abstract class _ArtLinks implements ArtLinks {
   String? get self;
   @override
   String? get search;
+
+  /// Create a copy of ArtLinks
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtLinksCopyWith<_ArtLinks> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtLinksImplCopyWith<_$ArtLinksImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2310,46 +2426,8 @@ ArtMaker _$ArtMakerFromJson(Map<String, dynamic> json) {
 }
 
 /// @nodoc
-class _$ArtMakerTearOff {
-  const _$ArtMakerTearOff();
-
-  _ArtMaker call(
-      {required String name,
-      required String unFixedName,
-      String? placeOfBirth,
-      @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfBirth,
-      @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfDeath,
-      String? placeOfDeath,
-      required List<String> occupation,
-      required List<String> roles,
-      String? nationality,
-      String? biography,
-      required String labelDesc}) {
-    return _ArtMaker(
-      name: name,
-      unFixedName: unFixedName,
-      placeOfBirth: placeOfBirth,
-      dateOfBirth: dateOfBirth,
-      dateOfDeath: dateOfDeath,
-      placeOfDeath: placeOfDeath,
-      occupation: occupation,
-      roles: roles,
-      nationality: nationality,
-      biography: biography,
-      labelDesc: labelDesc,
-    );
-  }
-
-  ArtMaker fromJson(Map<String, Object?> json) {
-    return ArtMaker.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtMaker = _$ArtMakerTearOff();
-
-/// @nodoc
 mixin _$ArtMaker {
+  String? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get unFixedName => throw _privateConstructorUsedError;
   String? get placeOfBirth => throw _privateConstructorUsedError;
@@ -2364,8 +2442,12 @@ mixin _$ArtMaker {
   String? get biography => throw _privateConstructorUsedError;
   String get labelDesc => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtMaker to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtMaker
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtMakerCopyWith<ArtMaker> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2373,9 +2455,11 @@ mixin _$ArtMaker {
 /// @nodoc
 abstract class $ArtMakerCopyWith<$Res> {
   factory $ArtMakerCopyWith(ArtMaker value, $Res Function(ArtMaker) then) =
-      _$ArtMakerCopyWithImpl<$Res>;
+      _$ArtMakerCopyWithImpl<$Res, ArtMaker>;
+  @useResult
   $Res call(
-      {String name,
+      {String? id,
+      String name,
       String unFixedName,
       String? placeOfBirth,
       @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfBirth,
@@ -2389,83 +2473,97 @@ abstract class $ArtMakerCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtMakerCopyWithImpl<$Res> implements $ArtMakerCopyWith<$Res> {
+class _$ArtMakerCopyWithImpl<$Res, $Val extends ArtMaker>
+    implements $ArtMakerCopyWith<$Res> {
   _$ArtMakerCopyWithImpl(this._value, this._then);
 
-  final ArtMaker _value;
   // ignore: unused_field
-  final $Res Function(ArtMaker) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtMaker
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? unFixedName = freezed,
+    Object? id = freezed,
+    Object? name = null,
+    Object? unFixedName = null,
     Object? placeOfBirth = freezed,
     Object? dateOfBirth = freezed,
     Object? dateOfDeath = freezed,
     Object? placeOfDeath = freezed,
-    Object? occupation = freezed,
-    Object? roles = freezed,
+    Object? occupation = null,
+    Object? roles = null,
     Object? nationality = freezed,
     Object? biography = freezed,
-    Object? labelDesc = freezed,
+    Object? labelDesc = null,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      unFixedName: unFixedName == freezed
+      unFixedName: null == unFixedName
           ? _value.unFixedName
           : unFixedName // ignore: cast_nullable_to_non_nullable
               as String,
-      placeOfBirth: placeOfBirth == freezed
+      placeOfBirth: freezed == placeOfBirth
           ? _value.placeOfBirth
           : placeOfBirth // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateOfBirth: dateOfBirth == freezed
+      dateOfBirth: freezed == dateOfBirth
           ? _value.dateOfBirth
           : dateOfBirth // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      dateOfDeath: dateOfDeath == freezed
+      dateOfDeath: freezed == dateOfDeath
           ? _value.dateOfDeath
           : dateOfDeath // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      placeOfDeath: placeOfDeath == freezed
+      placeOfDeath: freezed == placeOfDeath
           ? _value.placeOfDeath
           : placeOfDeath // ignore: cast_nullable_to_non_nullable
               as String?,
-      occupation: occupation == freezed
+      occupation: null == occupation
           ? _value.occupation
           : occupation // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      roles: roles == freezed
+      roles: null == roles
           ? _value.roles
           : roles // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      nationality: nationality == freezed
+      nationality: freezed == nationality
           ? _value.nationality
           : nationality // ignore: cast_nullable_to_non_nullable
               as String?,
-      biography: biography == freezed
+      biography: freezed == biography
           ? _value.biography
           : biography // ignore: cast_nullable_to_non_nullable
               as String?,
-      labelDesc: labelDesc == freezed
+      labelDesc: null == labelDesc
           ? _value.labelDesc
           : labelDesc // ignore: cast_nullable_to_non_nullable
               as String,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtMakerCopyWith<$Res> implements $ArtMakerCopyWith<$Res> {
-  factory _$ArtMakerCopyWith(_ArtMaker value, $Res Function(_ArtMaker) then) =
-      __$ArtMakerCopyWithImpl<$Res>;
+abstract class _$$ArtMakerImplCopyWith<$Res>
+    implements $ArtMakerCopyWith<$Res> {
+  factory _$$ArtMakerImplCopyWith(
+          _$ArtMakerImpl value, $Res Function(_$ArtMakerImpl) then) =
+      __$$ArtMakerImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
-      {String name,
+      {String? id,
+      String name,
       String unFixedName,
       String? placeOfBirth,
       @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfBirth,
@@ -2479,70 +2577,77 @@ abstract class _$ArtMakerCopyWith<$Res> implements $ArtMakerCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ArtMakerCopyWithImpl<$Res> extends _$ArtMakerCopyWithImpl<$Res>
-    implements _$ArtMakerCopyWith<$Res> {
-  __$ArtMakerCopyWithImpl(_ArtMaker _value, $Res Function(_ArtMaker) _then)
-      : super(_value, (v) => _then(v as _ArtMaker));
+class __$$ArtMakerImplCopyWithImpl<$Res>
+    extends _$ArtMakerCopyWithImpl<$Res, _$ArtMakerImpl>
+    implements _$$ArtMakerImplCopyWith<$Res> {
+  __$$ArtMakerImplCopyWithImpl(
+      _$ArtMakerImpl _value, $Res Function(_$ArtMakerImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtMaker get _value => super._value as _ArtMaker;
-
+  /// Create a copy of ArtMaker
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? unFixedName = freezed,
+    Object? id = freezed,
+    Object? name = null,
+    Object? unFixedName = null,
     Object? placeOfBirth = freezed,
     Object? dateOfBirth = freezed,
     Object? dateOfDeath = freezed,
     Object? placeOfDeath = freezed,
-    Object? occupation = freezed,
-    Object? roles = freezed,
+    Object? occupation = null,
+    Object? roles = null,
     Object? nationality = freezed,
     Object? biography = freezed,
-    Object? labelDesc = freezed,
+    Object? labelDesc = null,
   }) {
-    return _then(_ArtMaker(
-      name: name == freezed
+    return _then(_$ArtMakerImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      unFixedName: unFixedName == freezed
+      unFixedName: null == unFixedName
           ? _value.unFixedName
           : unFixedName // ignore: cast_nullable_to_non_nullable
               as String,
-      placeOfBirth: placeOfBirth == freezed
+      placeOfBirth: freezed == placeOfBirth
           ? _value.placeOfBirth
           : placeOfBirth // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateOfBirth: dateOfBirth == freezed
+      dateOfBirth: freezed == dateOfBirth
           ? _value.dateOfBirth
           : dateOfBirth // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      dateOfDeath: dateOfDeath == freezed
+      dateOfDeath: freezed == dateOfDeath
           ? _value.dateOfDeath
           : dateOfDeath // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      placeOfDeath: placeOfDeath == freezed
+      placeOfDeath: freezed == placeOfDeath
           ? _value.placeOfDeath
           : placeOfDeath // ignore: cast_nullable_to_non_nullable
               as String?,
-      occupation: occupation == freezed
-          ? _value.occupation
+      occupation: null == occupation
+          ? _value._occupation
           : occupation // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      roles: roles == freezed
-          ? _value.roles
+      roles: null == roles
+          ? _value._roles
           : roles // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      nationality: nationality == freezed
+      nationality: freezed == nationality
           ? _value.nationality
           : nationality // ignore: cast_nullable_to_non_nullable
               as String?,
-      biography: biography == freezed
+      biography: freezed == biography
           ? _value.biography
           : biography // ignore: cast_nullable_to_non_nullable
               as String?,
-      labelDesc: labelDesc == freezed
+      labelDesc: null == labelDesc
           ? _value.labelDesc
           : labelDesc // ignore: cast_nullable_to_non_nullable
               as String,
@@ -2552,23 +2657,28 @@ class __$ArtMakerCopyWithImpl<$Res> extends _$ArtMakerCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtMaker implements _ArtMaker {
-  const _$_ArtMaker(
-      {required this.name,
+class _$ArtMakerImpl implements _ArtMaker {
+  const _$ArtMakerImpl(
+      {this.id,
+      required this.name,
       required this.unFixedName,
       this.placeOfBirth,
       @JsonKey(fromJson: stringToDateNullableParser) this.dateOfBirth,
       @JsonKey(fromJson: stringToDateNullableParser) this.dateOfDeath,
       this.placeOfDeath,
-      required this.occupation,
-      required this.roles,
+      required final List<String> occupation,
+      required final List<String> roles,
       this.nationality,
       this.biography,
-      required this.labelDesc});
+      required this.labelDesc})
+      : _occupation = occupation,
+        _roles = roles;
 
-  factory _$_ArtMaker.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtMakerFromJson(json);
+  factory _$ArtMakerImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtMakerImplFromJson(json);
 
+  @override
+  final String? id;
   @override
   final String name;
   @override
@@ -2583,10 +2693,22 @@ class _$_ArtMaker implements _ArtMaker {
   final DateTime? dateOfDeath;
   @override
   final String? placeOfDeath;
+  final List<String> _occupation;
   @override
-  final List<String> occupation;
+  List<String> get occupation {
+    if (_occupation is EqualUnmodifiableListView) return _occupation;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_occupation);
+  }
+
+  final List<String> _roles;
   @override
-  final List<String> roles;
+  List<String> get roles {
+    if (_roles is EqualUnmodifiableListView) return _roles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_roles);
+  }
+
   @override
   final String? nationality;
   @override
@@ -2596,76 +2718,92 @@ class _$_ArtMaker implements _ArtMaker {
 
   @override
   String toString() {
-    return 'ArtMaker(name: $name, unFixedName: $unFixedName, placeOfBirth: $placeOfBirth, dateOfBirth: $dateOfBirth, dateOfDeath: $dateOfDeath, placeOfDeath: $placeOfDeath, occupation: $occupation, roles: $roles, nationality: $nationality, biography: $biography, labelDesc: $labelDesc)';
+    return 'ArtMaker(id: $id, name: $name, unFixedName: $unFixedName, placeOfBirth: $placeOfBirth, dateOfBirth: $dateOfBirth, dateOfDeath: $dateOfDeath, placeOfDeath: $placeOfDeath, occupation: $occupation, roles: $roles, nationality: $nationality, biography: $biography, labelDesc: $labelDesc)';
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtMaker &&
-            const DeepCollectionEquality().equals(other.name, name) &&
+            other is _$ArtMakerImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.unFixedName, unFixedName) ||
+                other.unFixedName == unFixedName) &&
+            (identical(other.placeOfBirth, placeOfBirth) ||
+                other.placeOfBirth == placeOfBirth) &&
+            (identical(other.dateOfBirth, dateOfBirth) ||
+                other.dateOfBirth == dateOfBirth) &&
+            (identical(other.dateOfDeath, dateOfDeath) ||
+                other.dateOfDeath == dateOfDeath) &&
+            (identical(other.placeOfDeath, placeOfDeath) ||
+                other.placeOfDeath == placeOfDeath) &&
             const DeepCollectionEquality()
-                .equals(other.unFixedName, unFixedName) &&
-            const DeepCollectionEquality()
-                .equals(other.placeOfBirth, placeOfBirth) &&
-            const DeepCollectionEquality()
-                .equals(other.dateOfBirth, dateOfBirth) &&
-            const DeepCollectionEquality()
-                .equals(other.dateOfDeath, dateOfDeath) &&
-            const DeepCollectionEquality()
-                .equals(other.placeOfDeath, placeOfDeath) &&
-            const DeepCollectionEquality()
-                .equals(other.occupation, occupation) &&
-            const DeepCollectionEquality().equals(other.roles, roles) &&
-            const DeepCollectionEquality()
-                .equals(other.nationality, nationality) &&
-            const DeepCollectionEquality().equals(other.biography, biography) &&
-            const DeepCollectionEquality().equals(other.labelDesc, labelDesc));
+                .equals(other._occupation, _occupation) &&
+            const DeepCollectionEquality().equals(other._roles, _roles) &&
+            (identical(other.nationality, nationality) ||
+                other.nationality == nationality) &&
+            (identical(other.biography, biography) ||
+                other.biography == biography) &&
+            (identical(other.labelDesc, labelDesc) ||
+                other.labelDesc == labelDesc));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(name),
-      const DeepCollectionEquality().hash(unFixedName),
-      const DeepCollectionEquality().hash(placeOfBirth),
-      const DeepCollectionEquality().hash(dateOfBirth),
-      const DeepCollectionEquality().hash(dateOfDeath),
-      const DeepCollectionEquality().hash(placeOfDeath),
-      const DeepCollectionEquality().hash(occupation),
-      const DeepCollectionEquality().hash(roles),
-      const DeepCollectionEquality().hash(nationality),
-      const DeepCollectionEquality().hash(biography),
-      const DeepCollectionEquality().hash(labelDesc));
+      id,
+      name,
+      unFixedName,
+      placeOfBirth,
+      dateOfBirth,
+      dateOfDeath,
+      placeOfDeath,
+      const DeepCollectionEquality().hash(_occupation),
+      const DeepCollectionEquality().hash(_roles),
+      nationality,
+      biography,
+      labelDesc);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtMaker
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtMakerCopyWith<_ArtMaker> get copyWith =>
-      __$ArtMakerCopyWithImpl<_ArtMaker>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtMakerImplCopyWith<_$ArtMakerImpl> get copyWith =>
+      __$$ArtMakerImplCopyWithImpl<_$ArtMakerImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtMakerToJson(this);
+    return _$$ArtMakerImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtMaker implements ArtMaker {
   const factory _ArtMaker(
-      {required String name,
-      required String unFixedName,
-      String? placeOfBirth,
-      @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfBirth,
-      @JsonKey(fromJson: stringToDateNullableParser) DateTime? dateOfDeath,
-      String? placeOfDeath,
-      required List<String> occupation,
-      required List<String> roles,
-      String? nationality,
-      String? biography,
-      required String labelDesc}) = _$_ArtMaker;
+      {final String? id,
+      required final String name,
+      required final String unFixedName,
+      final String? placeOfBirth,
+      @JsonKey(fromJson: stringToDateNullableParser)
+      final DateTime? dateOfBirth,
+      @JsonKey(fromJson: stringToDateNullableParser)
+      final DateTime? dateOfDeath,
+      final String? placeOfDeath,
+      required final List<String> occupation,
+      required final List<String> roles,
+      final String? nationality,
+      final String? biography,
+      required final String labelDesc}) = _$ArtMakerImpl;
 
-  factory _ArtMaker.fromJson(Map<String, dynamic> json) = _$_ArtMaker.fromJson;
+  factory _ArtMaker.fromJson(Map<String, dynamic> json) =
+      _$ArtMakerImpl.fromJson;
 
+  @override
+  String? get id;
   @override
   String get name;
   @override
@@ -2690,9 +2828,12 @@ abstract class _ArtMaker implements ArtMaker {
   String? get biography;
   @override
   String get labelDesc;
+
+  /// Create a copy of ArtMaker
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtMakerCopyWith<_ArtMaker> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtMakerImplCopyWith<_$ArtMakerImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2701,36 +2842,18 @@ ArtImage _$ArtImageFromJson(Map<String, dynamic> json) {
 }
 
 /// @nodoc
-class _$ArtImageTearOff {
-  const _$ArtImageTearOff();
-
-  _ArtImage call(
-      {String? guid, required int width, required int height, String? url}) {
-    return _ArtImage(
-      guid: guid,
-      width: width,
-      height: height,
-      url: url,
-    );
-  }
-
-  ArtImage fromJson(Map<String, Object?> json) {
-    return ArtImage.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtImage = _$ArtImageTearOff();
-
-/// @nodoc
 mixin _$ArtImage {
   String? get guid => throw _privateConstructorUsedError;
   int get width => throw _privateConstructorUsedError;
   int get height => throw _privateConstructorUsedError;
   String? get url => throw _privateConstructorUsedError;
 
+  /// Serializes this ArtImage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ArtImage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ArtImageCopyWith<ArtImage> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -2738,84 +2861,95 @@ mixin _$ArtImage {
 /// @nodoc
 abstract class $ArtImageCopyWith<$Res> {
   factory $ArtImageCopyWith(ArtImage value, $Res Function(ArtImage) then) =
-      _$ArtImageCopyWithImpl<$Res>;
+      _$ArtImageCopyWithImpl<$Res, ArtImage>;
+  @useResult
   $Res call({String? guid, int width, int height, String? url});
 }
 
 /// @nodoc
-class _$ArtImageCopyWithImpl<$Res> implements $ArtImageCopyWith<$Res> {
+class _$ArtImageCopyWithImpl<$Res, $Val extends ArtImage>
+    implements $ArtImageCopyWith<$Res> {
   _$ArtImageCopyWithImpl(this._value, this._then);
 
-  final ArtImage _value;
   // ignore: unused_field
-  final $Res Function(ArtImage) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  /// Create a copy of ArtImage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? guid = freezed,
-    Object? width = freezed,
-    Object? height = freezed,
+    Object? width = null,
+    Object? height = null,
     Object? url = freezed,
   }) {
     return _then(_value.copyWith(
-      guid: guid == freezed
+      guid: freezed == guid
           ? _value.guid
           : guid // ignore: cast_nullable_to_non_nullable
               as String?,
-      width: width == freezed
+      width: null == width
           ? _value.width
           : width // ignore: cast_nullable_to_non_nullable
               as int,
-      height: height == freezed
+      height: null == height
           ? _value.height
           : height // ignore: cast_nullable_to_non_nullable
               as int,
-      url: url == freezed
+      url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ArtImageCopyWith<$Res> implements $ArtImageCopyWith<$Res> {
-  factory _$ArtImageCopyWith(_ArtImage value, $Res Function(_ArtImage) then) =
-      __$ArtImageCopyWithImpl<$Res>;
+abstract class _$$ArtImageImplCopyWith<$Res>
+    implements $ArtImageCopyWith<$Res> {
+  factory _$$ArtImageImplCopyWith(
+          _$ArtImageImpl value, $Res Function(_$ArtImageImpl) then) =
+      __$$ArtImageImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({String? guid, int width, int height, String? url});
 }
 
 /// @nodoc
-class __$ArtImageCopyWithImpl<$Res> extends _$ArtImageCopyWithImpl<$Res>
-    implements _$ArtImageCopyWith<$Res> {
-  __$ArtImageCopyWithImpl(_ArtImage _value, $Res Function(_ArtImage) _then)
-      : super(_value, (v) => _then(v as _ArtImage));
+class __$$ArtImageImplCopyWithImpl<$Res>
+    extends _$ArtImageCopyWithImpl<$Res, _$ArtImageImpl>
+    implements _$$ArtImageImplCopyWith<$Res> {
+  __$$ArtImageImplCopyWithImpl(
+      _$ArtImageImpl _value, $Res Function(_$ArtImageImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ArtImage get _value => super._value as _ArtImage;
-
+  /// Create a copy of ArtImage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? guid = freezed,
-    Object? width = freezed,
-    Object? height = freezed,
+    Object? width = null,
+    Object? height = null,
     Object? url = freezed,
   }) {
-    return _then(_ArtImage(
-      guid: guid == freezed
+    return _then(_$ArtImageImpl(
+      guid: freezed == guid
           ? _value.guid
           : guid // ignore: cast_nullable_to_non_nullable
               as String?,
-      width: width == freezed
+      width: null == width
           ? _value.width
           : width // ignore: cast_nullable_to_non_nullable
               as int,
-      height: height == freezed
+      height: null == height
           ? _value.height
           : height // ignore: cast_nullable_to_non_nullable
               as int,
-      url: url == freezed
+      url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -2825,12 +2959,12 @@ class __$ArtImageCopyWithImpl<$Res> extends _$ArtImageCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ArtImage implements _ArtImage {
-  const _$_ArtImage(
+class _$ArtImageImpl implements _ArtImage {
+  const _$ArtImageImpl(
       {this.guid, required this.width, required this.height, this.url});
 
-  factory _$_ArtImage.fromJson(Map<String, dynamic> json) =>
-      _$$_ArtImageFromJson(json);
+  factory _$ArtImageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ArtImageImplFromJson(json);
 
   @override
   final String? guid;
@@ -2847,43 +2981,45 @@ class _$_ArtImage implements _ArtImage {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ArtImage &&
-            const DeepCollectionEquality().equals(other.guid, guid) &&
-            const DeepCollectionEquality().equals(other.width, width) &&
-            const DeepCollectionEquality().equals(other.height, height) &&
-            const DeepCollectionEquality().equals(other.url, url));
+            other is _$ArtImageImpl &&
+            (identical(other.guid, guid) || other.guid == guid) &&
+            (identical(other.width, width) || other.width == width) &&
+            (identical(other.height, height) || other.height == height) &&
+            (identical(other.url, url) || other.url == url));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(guid),
-      const DeepCollectionEquality().hash(width),
-      const DeepCollectionEquality().hash(height),
-      const DeepCollectionEquality().hash(url));
+  int get hashCode => Object.hash(runtimeType, guid, width, height, url);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ArtImage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  _$ArtImageCopyWith<_ArtImage> get copyWith =>
-      __$ArtImageCopyWithImpl<_ArtImage>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ArtImageImplCopyWith<_$ArtImageImpl> get copyWith =>
+      __$$ArtImageImplCopyWithImpl<_$ArtImageImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtImageToJson(this);
+    return _$$ArtImageImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArtImage implements ArtImage {
   const factory _ArtImage(
-      {String? guid,
-      required int width,
-      required int height,
-      String? url}) = _$_ArtImage;
+      {final String? guid,
+      required final int width,
+      required final int height,
+      final String? url}) = _$ArtImageImpl;
 
-  factory _ArtImage.fromJson(Map<String, dynamic> json) = _$_ArtImage.fromJson;
+  factory _ArtImage.fromJson(Map<String, dynamic> json) =
+      _$ArtImageImpl.fromJson;
 
   @override
   String? get guid;
@@ -2893,8 +3029,11 @@ abstract class _ArtImage implements ArtImage {
   int get height;
   @override
   String? get url;
+
+  /// Create a copy of ArtImage
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
-  _$ArtImageCopyWith<_ArtImage> get copyWith =>
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ArtImageImplCopyWith<_$ArtImageImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

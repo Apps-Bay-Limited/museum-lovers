@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:museumLovers/screens/favorites_page.dart';
 import 'package:museumLovers/screens/home_page.dart';
+import 'package:museumLovers/screens/settings_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   static const List<Widget> _pages = <Widget>[
     HomePage(),
     FavoritesPage(),
+    SettingsPage(),
   ];
 
   @override
@@ -39,6 +41,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
               icon: Icon(Icons.favorite_outline),
               selectedIcon: Icon(Icons.favorite),
               label: 'Favorites',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: 'Settings',
             ),
           ],
         ),

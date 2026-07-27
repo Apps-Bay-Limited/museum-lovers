@@ -6,7 +6,7 @@ part of 'models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Art _$$_ArtFromJson(Map<String, dynamic> json) => _$_Art(
+_$ArtImpl _$$ArtImplFromJson(Map<String, dynamic> json) => _$ArtImpl(
       id: json['id'] as String,
       objectNumber: json['objectNumber'] as String,
       title: json['title'] as String,
@@ -23,7 +23,7 @@ _$_Art _$$_ArtFromJson(Map<String, dynamic> json) => _$_Art(
       links: ArtLinks.fromJson(json['links'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$_ArtToJson(_$_Art instance) => <String, dynamic>{
+Map<String, dynamic> _$$ArtImplToJson(_$ArtImpl instance) => <String, dynamic>{
       'id': instance.id,
       'objectNumber': instance.objectNumber,
       'title': instance.title,
@@ -36,7 +36,8 @@ Map<String, dynamic> _$$_ArtToJson(_$_Art instance) => <String, dynamic>{
       'links': instance.links,
     };
 
-_$_ArtDetail _$$_ArtDetailFromJson(Map<String, dynamic> json) => _$_ArtDetail(
+_$ArtDetailImpl _$$ArtDetailImplFromJson(Map<String, dynamic> json) =>
+    _$ArtDetailImpl(
       id: json['id'] as String,
       objectNumber: json['objectNumber'] as String,
       colors: (json['colors'] as List<dynamic>)
@@ -92,9 +93,14 @@ _$_ArtDetail _$$_ArtDetailFromJson(Map<String, dynamic> json) => _$_ArtDetail(
           ? null
           : ArtImage.fromJson(json['webImage'] as Map<String, dynamic>),
       dating: ArtDating.fromJson(json['dating'] as Map<String, dynamic>),
+      inscriptions: (json['inscriptions'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      galleryLocation: json['galleryLocation'] as String?,
+      onDisplay: json['onDisplay'] as bool,
     );
 
-Map<String, dynamic> _$$_ArtDetailToJson(_$_ArtDetail instance) =>
+Map<String, dynamic> _$$ArtDetailImplToJson(_$ArtDetailImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'objectNumber': instance.objectNumber,
@@ -125,28 +131,33 @@ Map<String, dynamic> _$$_ArtDetailToJson(_$_ArtDetail instance) =>
       'physicalMedium': instance.physicalMedium,
       'webImage': instance.webImage,
       'dating': instance.dating,
+      'inscriptions': instance.inscriptions,
+      'galleryLocation': instance.galleryLocation,
+      'onDisplay': instance.onDisplay,
     };
 
-_$_ArtColor _$$_ArtColorFromJson(Map<String, dynamic> json) => _$_ArtColor(
+_$ArtColorImpl _$$ArtColorImplFromJson(Map<String, dynamic> json) =>
+    _$ArtColorImpl(
       percentage: (json['percentage'] as num).toDouble(),
       hex: json['hex'] as String,
     );
 
-Map<String, dynamic> _$$_ArtColorToJson(_$_ArtColor instance) =>
+Map<String, dynamic> _$$ArtColorImplToJson(_$ArtColorImpl instance) =>
     <String, dynamic>{
       'percentage': instance.percentage,
       'hex': instance.hex,
     };
 
-_$_ArtDating _$$_ArtDatingFromJson(Map<String, dynamic> json) => _$_ArtDating(
+_$ArtDatingImpl _$$ArtDatingImplFromJson(Map<String, dynamic> json) =>
+    _$ArtDatingImpl(
       presentingDate: json['presentingDate'] as String,
-      sortingDate: json['sortingDate'] as int,
-      period: json['period'] as int,
-      yearEarly: json['yearEarly'] as int,
-      yearLate: json['yearLate'] as int,
+      sortingDate: (json['sortingDate'] as num).toInt(),
+      period: (json['period'] as num).toInt(),
+      yearEarly: (json['yearEarly'] as num).toInt(),
+      yearLate: (json['yearLate'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$_ArtDatingToJson(_$_ArtDating instance) =>
+Map<String, dynamic> _$$ArtDatingImplToJson(_$ArtDatingImpl instance) =>
     <String, dynamic>{
       'presentingDate': instance.presentingDate,
       'sortingDate': instance.sortingDate,
@@ -155,15 +166,15 @@ Map<String, dynamic> _$$_ArtDatingToJson(_$_ArtDating instance) =>
       'yearLate': instance.yearLate,
     };
 
-_$_ArtDimension _$$_ArtDimensionFromJson(Map<String, dynamic> json) =>
-    _$_ArtDimension(
+_$ArtDimensionImpl _$$ArtDimensionImplFromJson(Map<String, dynamic> json) =>
+    _$ArtDimensionImpl(
       unit: json['unit'] as String,
       type: json['type'] as String?,
       value: stringToDoubleParser(json['value'] as String),
       part: json['part'] as String?,
     );
 
-Map<String, dynamic> _$$_ArtDimensionToJson(_$_ArtDimension instance) =>
+Map<String, dynamic> _$$ArtDimensionImplToJson(_$ArtDimensionImpl instance) =>
     <String, dynamic>{
       'unit': instance.unit,
       'type': instance.type,
@@ -171,7 +182,8 @@ Map<String, dynamic> _$$_ArtDimensionToJson(_$_ArtDimension instance) =>
       'part': instance.part,
     };
 
-_$_ArtLabel _$$_ArtLabelFromJson(Map<String, dynamic> json) => _$_ArtLabel(
+_$ArtLabelImpl _$$ArtLabelImplFromJson(Map<String, dynamic> json) =>
+    _$ArtLabelImpl(
       title: json['title'] as String?,
       makerLine: json['makerLine'] as String?,
       description: json['description'] as String?,
@@ -180,7 +192,7 @@ _$_ArtLabel _$$_ArtLabelFromJson(Map<String, dynamic> json) => _$_ArtLabel(
           json['date'] == null ? null : DateTime.parse(json['date'] as String),
     );
 
-Map<String, dynamic> _$$_ArtLabelToJson(_$_ArtLabel instance) =>
+Map<String, dynamic> _$$ArtLabelImplToJson(_$ArtLabelImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'makerLine': instance.makerLine,
@@ -189,20 +201,23 @@ Map<String, dynamic> _$$_ArtLabelToJson(_$_ArtLabel instance) =>
       'date': instance.date?.toIso8601String(),
     };
 
-_$_ArtLinks _$$_ArtLinksFromJson(Map<String, dynamic> json) => _$_ArtLinks(
+_$ArtLinksImpl _$$ArtLinksImplFromJson(Map<String, dynamic> json) =>
+    _$ArtLinksImpl(
       web: json['web'] as String?,
       self: json['self'] as String?,
       search: json['search'] as String?,
     );
 
-Map<String, dynamic> _$$_ArtLinksToJson(_$_ArtLinks instance) =>
+Map<String, dynamic> _$$ArtLinksImplToJson(_$ArtLinksImpl instance) =>
     <String, dynamic>{
       'web': instance.web,
       'self': instance.self,
       'search': instance.search,
     };
 
-_$_ArtMaker _$$_ArtMakerFromJson(Map<String, dynamic> json) => _$_ArtMaker(
+_$ArtMakerImpl _$$ArtMakerImplFromJson(Map<String, dynamic> json) =>
+    _$ArtMakerImpl(
+      id: json['id'] as String?,
       name: json['name'] as String,
       unFixedName: json['unFixedName'] as String,
       placeOfBirth: json['placeOfBirth'] as String?,
@@ -218,8 +233,9 @@ _$_ArtMaker _$$_ArtMakerFromJson(Map<String, dynamic> json) => _$_ArtMaker(
       labelDesc: json['labelDesc'] as String,
     );
 
-Map<String, dynamic> _$$_ArtMakerToJson(_$_ArtMaker instance) =>
+Map<String, dynamic> _$$ArtMakerImplToJson(_$ArtMakerImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'unFixedName': instance.unFixedName,
       'placeOfBirth': instance.placeOfBirth,
@@ -233,14 +249,15 @@ Map<String, dynamic> _$$_ArtMakerToJson(_$_ArtMaker instance) =>
       'labelDesc': instance.labelDesc,
     };
 
-_$_ArtImage _$$_ArtImageFromJson(Map<String, dynamic> json) => _$_ArtImage(
+_$ArtImageImpl _$$ArtImageImplFromJson(Map<String, dynamic> json) =>
+    _$ArtImageImpl(
       guid: json['guid'] as String?,
-      width: json['width'] as int,
-      height: json['height'] as int,
+      width: (json['width'] as num).toInt(),
+      height: (json['height'] as num).toInt(),
       url: json['url'] as String?,
     );
 
-Map<String, dynamic> _$$_ArtImageToJson(_$_ArtImage instance) =>
+Map<String, dynamic> _$$ArtImageImplToJson(_$ArtImageImpl instance) =>
     <String, dynamic>{
       'guid': instance.guid,
       'width': instance.width,

@@ -3,9 +3,15 @@ import './models.dart';
 abstract class RijksRepository {
   Future<ArtDetail> fetch(String objectNumber);
 
-  Future<List<Art>> fetchAll({required int page});
+  /// [type] selects a category (e.g. `painting`, `drawing`, `sculpture`).
+  /// When [masterpieces] is true, [type] is ignored and the museum's curated
+  /// Top 1000 set is browsed instead.
+  Future<List<Art>> fetchAll({required int page, String type = 'painting', bool masterpieces = false});
 
   Future<List<Art>> fetchSearchAll({required int page, required String term});
 
   Future<List<Art>> fetchByColor({required String hex, required int page});
+
+  /// Resolves a full artist biography by their Rijksmuseum Person id.
+  Future<ArtMaker> fetchArtist(String id);
 }

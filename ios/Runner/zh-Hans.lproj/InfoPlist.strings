@@ -7,6 +7,5 @@
 */
 
 "CFBundleDisplayName" = "博物馆迷";
-"NSUserTrackingUsageDescription" = "该标识符将用于向您投放个性化广告";
-"NSPhotoLibraryAddUsageDescription" = "该应用需要保存照片的权限用于保存这张图片";
-"NSPhotoLibraryUsageDescription" = "该应用需要保存照片的权限用于保存这张图片";
+"NSUserTrackingUsageDescription" = "此标识符用于向您展示更相关的广告，例如与您在"博物馆迷"中浏览过的作品相似的艺术展览、画廊活动或博物馆相关应用。";
+"NSPhotoLibraryAddUsageDescription" = "博物馆迷会将艺术品图片保存到您的照片库，例如当您在作品详情页点击下载按钮以保留一份图片时。";

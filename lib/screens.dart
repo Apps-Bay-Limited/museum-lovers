@@ -1,6 +1,9 @@
+export 'screens/artist_page.dart';
 export 'screens/data_controller.dart';
 export 'screens/details_page.dart';
 export 'screens/favorites_page.dart';
 export 'screens/home_page.dart';
 export 'screens/main_navigation_page.dart';
+export 'screens/quiz_page.dart';
+export 'screens/settings_page.dart';
 export 'screens/slideshow_page.dart';

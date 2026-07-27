@@ -10,6 +10,7 @@ import 'package:museumLovers/util/image_saver.dart';
 import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
 
+import 'artist_page.dart';
 import 'data_controller.dart';
 import 'detail_full_page.dart';
 
@@ -296,11 +297,16 @@ class __DataViewState extends State<_DataView> {
           color: Colors.white60,
         ),
         AppSpacing.v16,
-        Row(children: <Widget>[
-          const Icon(Icons.brush_rounded, size: 20),
-          AppSpacing.h4,
-          Text(widget.data.principalMaker, style: textTheme.titleLarge),
-        ]),
+        InkWell(
+          onTap: () => _openMaker(context, widget.data.principalMakers.isEmpty
+              ? null
+              : widget.data.principalMakers.first),
+          child: Row(children: <Widget>[
+            const Icon(Icons.brush_rounded, size: 20),
+            AppSpacing.h4,
+            Text(widget.data.principalMaker, style: textTheme.titleLarge),
+          ]),
+        ),
         AppSpacing.v10,
         Text(
           widget.data.label.description ??
@@ -371,16 +377,7 @@ class __DataViewState extends State<_DataView> {
         AppSpacing.v8,
         for (final ArtMaker maker in widget.data.principalMakers)
           InkWell(
-              onTap: () {
-                Navigator.push<dynamic>(
-                  context,
-                  CupertinoPageRoute<dynamic>(
-                    builder: (BuildContext context) => SearchDetailPage(
-                      searchTerm: maker.name,
-                    ),
-                  ),
-                );
-              },
+              onTap: () => _openMaker(context, maker),
               child: ArtMakerItem(key: Key(maker.name), maker: maker)),
         AppSpacing.v12,
         if (widget.data.productionPlaces.isNotEmpty) ...<Widget>[
@@ -410,6 +407,23 @@ class __DataViewState extends State<_DataView> {
               style: textTheme.bodyMedium),
           AppSpacing.v12,
         ],
+        if (widget.data.inscriptions.isNotEmpty) ...<Widget>[
+          const _SectionHeaderText('Inscriptions'),
+          AppSpacing.v8,
+          Text('— ' + widget.data.inscriptions.join('\n— '),
+              style: textTheme.bodyMedium?.copyWith(height: 1.25)),
+          AppSpacing.v12,
+        ],
+        if (widget.data.galleryLocation != null) ...<Widget>[
+          const _SectionHeaderText('On display'),
+          AppSpacing.v8,
+          Row(children: <Widget>[
+            const Icon(Icons.location_on_outlined, size: 18),
+            AppSpacing.h4,
+            Expanded(child: Text(widget.data.galleryLocation!, style: textTheme.bodyMedium)),
+          ]),
+          AppSpacing.v12,
+        ],
         if (widget.data.documentation.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Documentation'),
           AppSpacing.v8,
@@ -419,6 +433,21 @@ class __DataViewState extends State<_DataView> {
         ],
         AppSpacing.v24,
       ]),
+    );
+  }
+
+  void _openMaker(BuildContext context, ArtMaker? maker) {
+    if (maker == null) {
+      return;
+    }
+    final String? id = maker.id;
+    Navigator.push<dynamic>(
+      context,
+      CupertinoPageRoute<dynamic>(
+        builder: (BuildContext context) => id == null
+            ? SearchDetailPage(searchTerm: maker.name)
+            : ArtistPage(artistId: id, artistName: maker.name),
+      ),
     );
   }
 }

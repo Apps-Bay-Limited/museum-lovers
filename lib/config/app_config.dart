@@ -28,4 +28,8 @@ class AppConfig {
   }
 
   static String get rijksmuseumApiKey => Secrets.rijksmuseumApiKey;
+
+  static String get museumLoversAppStoreId => Secrets.museumLoversAppStoreId;
+
+  static String get appStoreUrl => 'https://apps.apple.com/app/id${Secrets.museumLoversAppStoreId}';
 }

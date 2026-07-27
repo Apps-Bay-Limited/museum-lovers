@@ -6,6 +6,10 @@ import '../config/app_config.dart';
 class AdsManager {
   static bool disableAllAdsForScreenshot = false;
 
+  /// Set once UMP consent has been gathered and [MobileAds] initialized.
+  /// No ad should be requested before this is true.
+  static bool adsAllowed = false;
+
   static String get bannerAdUnitId {
     if (disableAllAdsForScreenshot) return "";
     return AppConfig.bannerAdUnitId;
@@ -32,8 +36,9 @@ class AppOpenAdManager {
   /// Keep track of load time so we don't show an expired ad.
   DateTime? _appOpenLoadTime;
 
-  /// Load an AppOpenAd.
+  /// Load an AppOpenAd. No-op until UMP consent has cleared ad requests.
   void loadAd() {
+    if (!AdsManager.adsAllowed) return;
     AppOpenAd.load(
       adUnitId: AdsManager.openAdUnitID,
       // orientation: AppOpenAd.orientationPortrait,
