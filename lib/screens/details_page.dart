@@ -1,14 +1,20 @@
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:museumLovers/constants.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
 import 'package:museumLovers/screens/search_detail_page.dart';
 import 'package:museumLovers/util/image_saver.dart';
 import 'package:museumLovers/util/image_url.dart';
+import 'package:museumLovers/util/postcard_composer.dart';
 import 'package:museumLovers/widgets.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'artist_page.dart';
 import 'data_controller.dart';
@@ -34,6 +40,38 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   bool isDowloading = false;
+  bool _isSharingPostcard = false;
+
+  Future<void> _sharePostcard() async {
+    final String? url = widget.art.webImage?.url;
+    if (url == null || _isSharingPostcard) {
+      return;
+    }
+    await HapticFeedback.lightImpact();
+    setState(() => _isSharingPostcard = true);
+    try {
+      final Uint8List imageBytes =
+          await DefaultCacheManager().getSingleFile(url).then((file) => file.readAsBytes());
+      final Uint8List postcard = await PostcardComposer.compose(
+        imageBytes: imageBytes,
+        title: widget.art.title,
+        maker: widget.art.principalOrFirstMaker,
+        credit: 'via $appName',
+      );
+      await SharePlus.instance.share(
+        ShareParams(
+          files: <XFile>[XFile.fromData(postcard, name: 'artwork.png', mimeType: 'image/png')],
+          text: '${widget.art.title} — ${widget.art.principalOrFirstMaker}',
+        ),
+      );
+    } catch (_) {
+      await Fluttertoast.showToast(msg: 'Could not create the postcard. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isSharingPostcard = false);
+      }
+    }
+  }
 
   late final DetailDataController controller = DetailDataController(
       context.repository.fetch,
@@ -162,6 +200,34 @@ class _DetailsPageState extends State<DetailsPage> {
                 const SizedBox(
                   width: 12,
                 ),
+                Stack(
+                  children: <Widget>[
+                    Container(
+                      height: 56,
+                      width: 56,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(28),
+                          color: Colors.black45),
+                      child: IconButton(
+                        tooltip: 'Share as postcard',
+                        iconSize: 25,
+                        onPressed: widget.art.webImage?.url == null ? null : _sharePostcard,
+                        icon: const Icon(Icons.ios_share_rounded),
+                      ),
+                    ),
+                    if (_isSharingPostcard)
+                      const Center(
+                        child: SizedBox(
+                          height: 53,
+                          width: 53,
+                          child: CircularProgressIndicator(strokeWidth: 4, color: Colors.white),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 12,
+                ),
                 Container(
                     width: 56,
                     decoration: BoxDecoration(
@@ -256,6 +322,21 @@ class _DataView extends StatefulWidget {
 }
 
 class __DataViewState extends State<_DataView> {
+  late final Future<List<Art>> _moreByArtistFuture = _loadMoreByArtist();
+
+  Future<List<Art>> _loadMoreByArtist() async {
+    final String maker = widget.data.principalOrFirstMaker;
+    if (maker.isEmpty || maker == 'Anonymous') {
+      return const <Art>[];
+    }
+    try {
+      final List<Art> results = await context.repository.fetchSearchAll(page: 1, term: maker);
+      return results.where((Art art) => art.id != widget.data.id).take(10).toList();
+    } catch (_) {
+      return const <Art>[];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -351,7 +432,7 @@ class __DataViewState extends State<_DataView> {
                 builder: (BuildContext context) => SearchDetailPage(
                   searchTerm: hex,
                   title: 'Color $hex',
-                  source: ({required int page, required String term}) =>
+                  source: ({required int page, required String term, String? type}) =>
                       context.repository.fetchByColor(page: page, hex: term),
                 ),
               ),
@@ -380,6 +461,68 @@ class __DataViewState extends State<_DataView> {
               onTap: () => _openMaker(context, maker),
               child: ArtMakerItem(key: Key(maker.name), maker: maker)),
         AppSpacing.v12,
+        FutureBuilder<List<Art>>(
+          future: _moreByArtistFuture,
+          builder: (BuildContext context, AsyncSnapshot<List<Art>> snapshot) {
+            final List<Art> works = snapshot.data ?? const <Art>[];
+            if (works.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _SectionHeaderText('More by ${widget.data.principalOrFirstMaker}'),
+                  AppSpacing.v8,
+                  SizedBox(
+                    height: 150,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: works.length,
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
+                      itemBuilder: (BuildContext context, int index) {
+                        final Art art = works[index];
+                        return SizedBox(
+                          width: 110,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: InkWell(
+                              onTap: () => Navigator.of(context).push<void>(
+                                  MaterialPageRoute<void>(builder: (BuildContext context) => DetailsPage(art: art))),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: <Widget>[
+                                  if (art.webImage?.url != null)
+                                    CachedImage(url: artImageUrl(art.webImage!.url!, 300), memCacheWidth: 300),
+                                  Positioned(
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      color: Colors.black38,
+                                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                                      child: Text(
+                                        art.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: textTheme.bodySmall,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
         if (widget.data.productionPlaces.isNotEmpty) ...<Widget>[
           const _SectionHeaderText('Production places'),
           AppSpacing.v8,

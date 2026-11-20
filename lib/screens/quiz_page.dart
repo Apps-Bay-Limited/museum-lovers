@@ -32,6 +32,8 @@ class _QuizQuestion {
 
 enum _Phase { loading, error, playing, finished }
 
+enum _QuizSource { masterpieces, favorites }
+
 class _QuizPageState extends State<QuizPage> {
   final Random _random = Random();
 
@@ -40,6 +42,7 @@ class _QuizPageState extends State<QuizPage> {
   int _index = 0;
   int _score = 0;
   int? _selectedChoice;
+  _QuizSource _source = _QuizSource.masterpieces;
 
   @override
   void initState() {
@@ -47,10 +50,25 @@ class _QuizPageState extends State<QuizPage> {
     _loadQuiz();
   }
 
+  bool get _canUseFavorites =>
+      context.appStore.favorites.where((Art art) => art.webImage?.url != null).length >= QuizPage.choiceCount;
+
+  void _onSourceSelected(_QuizSource source) {
+    if (source == _source) {
+      return;
+    }
+    setState(() => _source = source);
+    _loadQuiz();
+  }
+
   Future<void> _loadQuiz() async {
+    // Read everything from `context` before the first `await` below.
+    final List<Art> favorites = context.appStore.favorites;
     setState(() => _phase = _Phase.loading);
     try {
-      final List<Art> pool = (await context.repository.fetchAll(page: 1, masterpieces: true))
+      final List<Art> pool = (_source == _QuizSource.favorites
+              ? favorites
+              : await context.repository.fetchAll(page: 1, masterpieces: true))
           .where((Art art) => art.webImage?.url != null)
           .toList()
         ..shuffle(_random);
@@ -115,6 +133,7 @@ class _QuizPageState extends State<QuizPage> {
 
   void _next() {
     if (_index + 1 >= _questions.length) {
+      context.appStore.recordQuizResult(score: _score, total: _questions.length);
       setState(() => _phase = _Phase.finished);
       return;
     }
@@ -131,8 +150,37 @@ class _QuizPageState extends State<QuizPage> {
           backgroundColor: const Color(0xff141213),
           title: const Text('Art quiz'),
         ),
-        body: SafeArea(child: _buildBody(context)),
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              if (_phase != _Phase.playing) _buildSourceSelector(context),
+              Expanded(child: _buildBody(context)),
+            ],
+          ),
+        ),
       );
+
+  Widget _buildSourceSelector(BuildContext context) {
+    final bool canUseFavorites = _canUseFavorites;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: Row(
+        children: <Widget>[
+          _SourceChip(
+            label: 'Masterpieces',
+            selected: _source == _QuizSource.masterpieces,
+            onTap: () => _onSourceSelected(_QuizSource.masterpieces),
+          ),
+          const SizedBox(width: 8),
+          _SourceChip(
+            label: 'My favorites',
+            selected: _source == _QuizSource.favorites,
+            onTap: canUseFavorites ? () => _onSourceSelected(_QuizSource.favorites) : null,
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildBody(BuildContext context) {
     switch (_phase) {
@@ -141,7 +189,9 @@ class _QuizPageState extends State<QuizPage> {
       case _Phase.error:
         return Center(
           child: ErrorDisplayView(
-            message: 'Could not load the quiz :(',
+            message: _source == _QuizSource.favorites
+                ? 'Favorite at least ${QuizPage.choiceCount} artworks with images to play this mode.'
+                : 'Could not load the quiz :(',
             onRetry: _loadQuiz,
           ),
         );
@@ -159,6 +209,39 @@ class _QuizPageState extends State<QuizPage> {
         );
     }
   }
+}
+
+class _SourceChip extends StatelessWidget {
+  const _SourceChip({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: selected ? const Color(0xffD2FCAC) : Colors.white10,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: onTap == null
+                    ? Colors.white24
+                    : selected
+                        ? const Color(0xff141213)
+                        : Colors.white70,
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 class _QuestionView extends StatelessWidget {
@@ -281,6 +364,8 @@ class _ResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final ({int score, int total})? best = context.appStore.quizBestResult;
+    final bool isBest = best != null && best.score == score && best.total == total;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -289,7 +374,17 @@ class _ResultView extends StatelessWidget {
           AppSpacing.v16,
           Text('$score / $total', style: theme.textTheme.headlineMedium),
           AppSpacing.v8,
-          Text('Nice eye!', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white60)),
+          Text(
+            isBest ? 'New best score!' : 'Nice eye!',
+            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white60),
+          ),
+          if (best != null) ...<Widget>[
+            AppSpacing.v4,
+            Text(
+              'Best: ${best.score} / ${best.total} · ${context.appStore.quizGamesPlayed} games played',
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white38),
+            ),
+          ],
           AppSpacing.v24,
           FilledButton(onPressed: onPlayAgain, child: const Text('Play again')),
         ],

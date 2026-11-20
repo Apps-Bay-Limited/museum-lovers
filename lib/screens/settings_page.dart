@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:museumLovers/config/app_config.dart';
 import 'package:museumLovers/config/more_apps.dart';
 import 'package:museumLovers/constants.dart';
+import 'package:museumLovers/provider.dart';
+import 'package:museumLovers/store/app_store.dart';
+import 'package:museumLovers/util/ads_manager.dart';
 import 'package:museumLovers/util/consent_manager.dart';
 import 'package:open_store/open_store.dart';
 import 'package:share_plus/share_plus.dart';
@@ -19,8 +23,21 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _rateApp() => InAppReview.instance.openStoreListing(appStoreId: AppConfig.museumLoversAppStoreId);
 
+  Future<void> _watchAdFreeAd(BuildContext context) async {
+    final AppStore store = context.appStore;
+    await RewardedAdManager.showForAdFreeDay(
+      onRewarded: () {
+        store.grantAdFree(const Duration(hours: 24));
+        Fluttertoast.showToast(msg: 'Ads switched off for 24 hours. Enjoy!');
+      },
+      onUnavailable: () => Fluttertoast.showToast(msg: 'No ad is ready right now — try again in a moment.'),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final AppStore store = context.appStore;
+    return Scaffold(
         backgroundColor: const Color(0xff141213),
         appBar: AppBar(
           backgroundColor: const Color(0xff141213),
@@ -37,6 +54,15 @@ class SettingsPage extends StatelessWidget {
               leading: const Icon(Icons.star_outline),
               title: const Text('Rate this app'),
               onTap: _rateApp,
+            ),
+            ListTile(
+              leading: const Icon(Icons.play_circle_outline),
+              title: const Text('Remove ads for 24 hours'),
+              subtitle: Text(
+                store.isAdFree ? 'Ad-free until ${store.adFreeUntil!.toLocal().hour}:00' : 'Watch a short video',
+              ),
+              enabled: !store.isAdFree,
+              onTap: () => _watchAdFreeAd(context),
             ),
             FutureBuilder<bool>(
               future: ConsentManager.isPrivacyOptionsRequired,
@@ -61,6 +87,7 @@ class SettingsPage extends StatelessWidget {
           ],
         ),
       );
+  }
 }
 
 class _MoreAppTile extends StatelessWidget {

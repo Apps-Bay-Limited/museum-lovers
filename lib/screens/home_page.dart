@@ -81,7 +81,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
-    WidgetsBinding.instance.addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+    WidgetsBinding.instance.addObserver(AppLifecycleReactor(
+      appOpenAdManager: appOpenAdManager,
+      isAdFree: () => AppStoreProvider.read(context).isAdFree,
+    ));
+    RewardedAdManager.preload();
   }
 
   @override
@@ -516,7 +520,12 @@ class _RecentlyViewedRow extends StatelessWidget {
                   fit: StackFit.expand,
                   children: <Widget>[
                     if (art.webImage?.url != null)
-                      CachedImage(url: artImageUrl(art.webImage!.url!, kGridImageSize)),
+                      // Smaller than the grid's kGridImageSize: this thumbnail
+                      // only ever renders at 110 logical px wide.
+                      CachedImage(
+                        url: artImageUrl(art.webImage!.url!, 300),
+                        memCacheWidth: 300,
+                      ),
                     Positioned(
                       left: 0,
                       right: 0,

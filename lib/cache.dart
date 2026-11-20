@@ -34,7 +34,10 @@ class InMemoryCache<K, V> implements Cache<K, V> {
   V? get(K id) {
     if (contains(id)) {
       _addToQueue(id);
-      return _cache[id]!;
+      // Not `_cache[id]!`: a cached value may legitimately be null (e.g. "we
+      // looked this up and there's no image"), and that null is a valid hit,
+      // not a missing entry.
+      return _cache[id];
     }
     return null;
   }

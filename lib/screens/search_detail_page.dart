@@ -8,10 +8,28 @@ import 'package:museumLovers/widgets/loading_spinner.dart';
 import 'data_controller.dart';
 import 'details_page.dart';
 
+/// A type facet shown as a filter chip in search results. [type] is the
+/// repository's `type=` query value (e.g. `painting`); null means "All".
+class SearchTypeFilter {
+  const SearchTypeFilter(this.label, this.type);
+
+  final String label;
+  final String? type;
+}
+
+const List<SearchTypeFilter> _searchTypeFilters = <SearchTypeFilter>[
+  SearchTypeFilter('All', null),
+  SearchTypeFilter('Paintings', 'painting'),
+  SearchTypeFilter('Drawings', 'drawing'),
+  SearchTypeFilter('Sculptures', 'sculpture'),
+  SearchTypeFilter('Photographs', 'photograph'),
+  SearchTypeFilter('Furniture', 'furniture'),
+];
+
 class SearchDetailPage extends StatefulWidget {
   final String searchTerm;
   final String? title;
-  final Future<List<Art>> Function({required int page, required String term})? source;
+  final Future<List<Art>> Function({required int page, required String term, String? type})? source;
 
   const SearchDetailPage({Key? key, required this.searchTerm, this.title, this.source}) : super(key: key);
 
@@ -39,10 +57,23 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
 
   LoadingStatus _loadingStatus = LoadingStatus.initial;
 
+  SearchTypeFilter _typeFilter = _searchTypeFilters.first;
+
   @override
   void initState() {
-    controller.fetch(widget.searchTerm).then(_onFinishedRequest);
+    controller.fetch(widget.searchTerm, type: _typeFilter.type).then(_onFinishedRequest);
     super.initState();
+  }
+
+  void _onTypeFilterSelected(SearchTypeFilter filter) {
+    if (filter == _typeFilter) {
+      return;
+    }
+    setState(() {
+      _typeFilter = filter;
+      _loadingStatus = LoadingStatus.initial;
+    });
+    controller.fetch(widget.searchTerm, type: filter.type).then(_onFinishedRequest);
   }
 
   @override
@@ -65,6 +96,41 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
                 actions: null,
                 backgroundColor: Color(0xff141213),
               ),
+              if (widget.source == null)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 48,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                      itemCount: _searchTypeFilters.length,
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
+                      itemBuilder: (BuildContext context, int index) {
+                        final SearchTypeFilter filter = _searchTypeFilters[index];
+                        final bool selected = filter == _typeFilter;
+                        return Material(
+                          color: selected ? const Color(0xffD2FCAC) : Colors.white10,
+                          borderRadius: BorderRadius.circular(20),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () => _onTypeFilterSelected(filter),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              child: Text(
+                                filter.label,
+                                style: TextStyle(
+                                  color: selected ? const Color(0xff141213) : Colors.white70,
+                                  fontSize: 13,
+                                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               AnimatedBuilder(
                 animation: combinedViewModel,
                 builder: (BuildContext context, _) {
@@ -154,10 +220,12 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
         ),
       );
 
-  void _onRetry() => controller.retry(widget.searchTerm).then(_onFinishedRequest);
+  void _onRetry() =>
+      controller.retry(widget.searchTerm, type: _typeFilter.type).then(_onFinishedRequest);
 
-  void _onLoadMore() =>
-      controller.next(widget.searchTerm).then((_) => _loadingStatus = LoadingStatus.idle);
+  void _onLoadMore() => controller
+      .next(widget.searchTerm, type: _typeFilter.type)
+      .then((_) => _loadingStatus = LoadingStatus.idle);
 
   void _onFinishedRequest(void _) {
     if (!controller.hasError) {

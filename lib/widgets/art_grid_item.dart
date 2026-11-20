@@ -4,10 +4,11 @@ import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
 
 class ArtGridItem extends StatelessWidget {
-  const ArtGridItem({Key? key, required this.art, required this.onPressed}) : super(key: key);
+  const ArtGridItem({Key? key, required this.art, required this.onPressed, this.onLongPress}) : super(key: key);
 
   final Art art;
   final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
 
   @visibleForTesting
   static const Key inkWellBoxKey = Key('ink-well-box');
@@ -23,6 +24,7 @@ class ArtGridItem extends StatelessWidget {
         child: InkWell(
           key: inkWellBoxKey,
           onTap: onPressed,
+          onLongPress: onLongPress,
           child: Stack(
             children: <Widget>[
               if (art.webImage?.url != null)

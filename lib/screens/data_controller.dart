@@ -56,9 +56,9 @@ abstract class DataSearchController<T> with ChangeNotifier {
 
   bool get hasError => _state == ConnectionState.done && error != null;
 
-  Future<void> fetch(String term);
+  Future<void> fetch(String term, {String? type});
 
-  Future<void> retry(String term);
+  Future<void> retry(String term, {String? type});
 }
 
 class PagedDataController extends DataController<List<Art>> {
@@ -138,39 +138,39 @@ class ControllerException implements Exception {
 class PagedSearchDataController extends DataSearchController<List<Art>> {
   PagedSearchDataController(this._source) : super(const <Art>[]);
 
-  final Future<List<Art>> Function({required int page, required String term}) _source;
+  final Future<List<Art>> Function({required int page, required String term, String? type}) _source;
 
   @visibleForTesting
   int get page => _page;
   int _page = 1;
 
   @override
-  Future<void> fetch(String term) async {
+  Future<void> fetch(String term, {String? type}) async {
     const int page = 1;
-    await _fetch(page, term, true);
+    await _fetch(page, term, true, type);
     if (!hasError) {
       _page = page;
     }
   }
 
-  Future<void> next(String term) async {
+  Future<void> next(String term, {String? type}) async {
     if (hasError) {
-      return retry(term);
+      return retry(term, type: type);
     }
     final int page = _page + 1;
-    await _fetch(page, term);
+    await _fetch(page, term, false, type);
     _page = page;
   }
 
   @override
-  Future<void> retry(String term) => _fetch(_page, term);
+  Future<void> retry(String term, {String? type}) => _fetch(_page, term, false, type);
 
-  Future<void> _fetch(int page, String term, [bool clear = false]) async {
+  Future<void> _fetch(int page, String term, bool clear, String? type) async {
     state = ConnectionState.waiting;
     try {
       _data = <Art>[
         if (!clear) ...data,
-        ...(await _source(page: page, term: term)),
+        ...(await _source(page: page, term: term, type: type)),
       ].toList(growable: false);
       _error = null;
     } catch (e, stackTrace) {

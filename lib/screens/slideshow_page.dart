@@ -1,9 +1,18 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/util/image_saver.dart';
 import 'package:museumLovers/widgets.dart';
+
+/// Autoplay intervals offered in the slideshow's speed menu.
+const Map<String, Duration> _autoplaySpeeds = <String, Duration>{
+  'Slow': Duration(seconds: 5),
+  'Medium': Duration(seconds: 3),
+  'Fast': Duration(seconds: 1, milliseconds: 500),
+};
 
 /// Full-screen, swipeable artwork viewer with pinch-to-zoom and save support.
 class SlideshowPage extends StatefulWidget {
@@ -22,13 +31,44 @@ class _SlideshowPageState extends State<SlideshowPage> {
   late final PageController _pageController = PageController(initialPage: widget.initialIndex);
   late int _currentIndex = widget.initialIndex;
   bool _isDownloading = false;
+  bool _isPlaying = false;
+  Duration _autoplayInterval = _autoplaySpeeds['Medium']!;
+  Timer? _autoplayTimer;
 
   Art get _currentArt => widget.arts[_currentIndex];
 
   @override
   void dispose() {
+    _autoplayTimer?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _toggleAutoplay() {
+    setState(() => _isPlaying = !_isPlaying);
+    if (_isPlaying) {
+      _restartAutoplay();
+    } else {
+      _autoplayTimer?.cancel();
+    }
+  }
+
+  void _restartAutoplay() {
+    _autoplayTimer?.cancel();
+    if (widget.arts.length < 2) {
+      return;
+    }
+    _autoplayTimer = Timer.periodic(_autoplayInterval, (_) {
+      final int next = (_currentIndex + 1) % widget.arts.length;
+      _pageController.animateToPage(next, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    });
+  }
+
+  void _selectSpeed(Duration interval) {
+    setState(() => _autoplayInterval = interval);
+    if (_isPlaying) {
+      _restartAutoplay();
+    }
   }
 
   Future<void> _saveCurrentImage() async {
@@ -91,6 +131,28 @@ class _SlideshowPageState extends State<SlideshowPage> {
               ),
               title: Text('${_currentIndex + 1} / ${widget.arts.length}'),
               centerTitle: true,
+              actions: widget.arts.length < 2
+                  ? null
+                  : <Widget>[
+                      PopupMenuButton<Duration>(
+                        tooltip: 'Autoplay speed',
+                        icon: const Icon(Icons.speed, color: Colors.white),
+                        onSelected: _selectSpeed,
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<Duration>>[
+                          for (final MapEntry<String, Duration> entry in _autoplaySpeeds.entries)
+                            CheckedPopupMenuItem<Duration>(
+                              value: entry.value,
+                              checked: entry.value == _autoplayInterval,
+                              child: Text(entry.key),
+                            ),
+                        ],
+                      ),
+                      IconButton(
+                        tooltip: _isPlaying ? 'Pause' : 'Autoplay',
+                        icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.white),
+                        onPressed: _toggleAutoplay,
+                      ),
+                    ],
             ),
           ),
           Positioned(
