@@ -37,6 +37,11 @@ class AppConfig {
     throw UnsupportedError('Unsupported platform');
   }
 
+  /// The one-time "Premium" unlock. Store-side ids differ only because the
+  /// iOS bundle id and Android package name differ.
+  static String get premiumProductId =>
+      Platform.isIOS ? 'com.appsbay.museumLovers.premium' : 'com.appsbay.museum_lovers.premium';
+
   static String get rijksmuseumApiKey => Secrets.rijksmuseumApiKey;
 
   static String get museumLoversAppStoreId => Secrets.museumLoversAppStoreId;

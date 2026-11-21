@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/store/app_store.dart';
+import 'package:museumLovers/util/premium_service.dart';
 
 class RepositoryProvider extends InheritedWidget {
   const RepositoryProvider({Key? key, required Widget child, required this.repository}) : super(key: key, child: child);
@@ -42,4 +43,19 @@ class AppStoreProvider extends InheritedNotifier<AppStore> {
 
 extension AppStoreProviderExtension on BuildContext {
   AppStore get appStore => AppStoreProvider.of(this);
+}
+
+class PremiumProvider extends InheritedNotifier<PremiumService> {
+  const PremiumProvider({Key? key, required PremiumService premium, required Widget child})
+      : super(key: key, notifier: premium, child: child);
+
+  static PremiumService of(BuildContext context) {
+    final PremiumProvider? provider = context.dependOnInheritedWidgetOfExactType<PremiumProvider>();
+    assert(provider != null, 'No PremiumProvider found in context');
+    return provider!.notifier!;
+  }
+}
+
+extension PremiumProviderExtension on BuildContext {
+  PremiumService get premium => PremiumProvider.of(this);
 }

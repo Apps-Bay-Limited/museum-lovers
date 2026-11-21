@@ -46,6 +46,7 @@ class AppStore extends ChangeNotifier {
   static const String _quizBestTotalKey = 'quiz_best_total';
   static const String _quizGamesPlayedKey = 'quiz_games_played';
   static const String _adFreeUntilKey = 'ad_free_until';
+  static const String _isPremiumKey = 'is_premium';
   static const int maxRecentSearches = 10;
   static const int maxRecentlyViewed = 20;
 
@@ -61,6 +62,7 @@ class AppStore extends ChangeNotifier {
   int _quizBestTotal = 0;
   int _quizGamesPlayed = 0;
   DateTime? _adFreeUntil;
+  bool _isPremium = false;
 
   /// Favorite artworks in the order they were added.
   List<Art> get favorites => List<Art>.unmodifiable(_favorites.values);
@@ -221,10 +223,24 @@ class AppStore extends ChangeNotifier {
   }
 
   // ---------------------------------------------------------------------------
-  // Ad-free grant (e.g. after watching a rewarded ad)
+  // Premium (one-time purchase) and temporary ad-free grants
   // ---------------------------------------------------------------------------
 
-  bool get isAdFree => _adFreeUntil != null && clock.now().isBefore(_adFreeUntil!);
+  bool get isPremium => _isPremium;
+
+  void setPremium(bool value) {
+    if (_isPremium == value) {
+      return;
+    }
+    _isPremium = value;
+    notifyListeners();
+    _prefs.setBool(_isPremiumKey, value);
+  }
+
+  bool get isAdFree => _isPremium || hasTemporaryAdFree;
+
+  /// True while a rewarded-ad grant is running, regardless of Premium.
+  bool get hasTemporaryAdFree => _adFreeUntil != null && clock.now().isBefore(_adFreeUntil!);
 
   DateTime? get adFreeUntil => _adFreeUntil;
 
@@ -269,6 +285,7 @@ class AppStore extends ChangeNotifier {
       _quizBestScore = _prefs.getInt(_quizBestScoreKey) ?? 0;
       _quizBestTotal = _prefs.getInt(_quizBestTotalKey) ?? 0;
       _quizGamesPlayed = _prefs.getInt(_quizGamesPlayedKey) ?? 0;
+      _isPremium = _prefs.getBool(_isPremiumKey) ?? false;
       final int? adFreeUntilMillis = _prefs.getInt(_adFreeUntilKey);
       if (adFreeUntilMillis != null) {
         _adFreeUntil = DateTime.fromMillisecondsSinceEpoch(adFreeUntilMillis);

@@ -4,6 +4,7 @@ import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
 import 'package:museumLovers/screens/search_detail_page.dart';
 import 'package:museumLovers/store/app_store.dart';
+import 'package:museumLovers/theme.dart';
 import 'package:museumLovers/util/ads_manager.dart';
 import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/widgets.dart';
@@ -31,6 +32,11 @@ const List<_BrowseCategory> _categories = <_BrowseCategory>[
   _BrowseCategory(label: 'Furniture', type: 'furniture'),
 ];
 
+void _openSearch(BuildContext context, String term) => Navigator.push<dynamic>(
+      context,
+      CupertinoPageRoute<dynamic>(builder: (_) => SearchDetailPage(searchTerm: term)),
+    );
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -57,11 +63,6 @@ class _HomePageState extends State<HomePage> {
   );
   final TextEditingController _inputController = TextEditingController();
 
-  final ValueNotifier<bool> singleColumn = ValueNotifier<bool>(false);
-
-  late final Listenable combinedViewModel =
-      Listenable.merge(<Listenable>[controller, singleColumn]);
-
   static const double loadMoreThreshold = 300;
 
   LoadingStatus _loadingStatus = LoadingStatus.initial;
@@ -80,18 +81,21 @@ class _HomePageState extends State<HomePage> {
     });
     super.initState();
 
-    AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
+    final AppStore store = AppStoreProvider.read(context);
+    final AppOpenAdManager appOpenAdManager = AppOpenAdManager();
     WidgetsBinding.instance.addObserver(AppLifecycleReactor(
       appOpenAdManager: appOpenAdManager,
-      isAdFree: () => AppStoreProvider.read(context).isAdFree,
+      isAdFree: () => store.isAdFree,
     ));
-    RewardedAdManager.preload();
+    if (!store.isPremium) {
+      appOpenAdManager.loadAd();
+      RewardedAdManager.preload();
+    }
   }
 
   @override
   void dispose() {
     controller.dispose();
-    singleColumn.dispose();
     _inputController.dispose();
     super.dispose();
   }
@@ -107,116 +111,59 @@ class _HomePageState extends State<HomePage> {
     controller.fetch().then(_onFinishedRequest);
   }
 
+  void _onSearch(String value) {
+    final String term = value.trim();
+    if (term.isEmpty) {
+      return;
+    }
+    AppStoreProvider.read(context).addRecentSearch(term);
+    _openSearch(context, term);
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff141213),
         body: NotificationListener<ScrollNotification>(
           onNotification: _onScrollNotification,
           child: CustomScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: <Widget>[
               SliverAppBar(
-                title: Container(
-                    // padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                    margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    child: TextField(
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        color: Colors.white,
-                      ),
-                      controller: _inputController,
-                      textInputAction: TextInputAction.search,
-                      onSubmitted: (String value) {
-                        if (value.isNotEmpty == true) {
-                          AppStoreProvider.read(context).addRecentSearch(value);
-                          Navigator.push<dynamic>(
-                            context,
-                            CupertinoPageRoute<dynamic>(
-                              builder: (_) => SearchDetailPage(
-                                searchTerm: value,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(0, 14, 0, 0),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                          ),
-                          suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: _inputController,
-                            builder: (BuildContext context, TextEditingValue value, _) {
-                              if (value.text.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
-                              return IconButton(
-                                tooltip: 'Clear',
-                                icon: const Icon(Icons.close, color: Colors.grey, size: 20),
-                                onPressed: _inputController.clear,
-                              );
-                            },
-                          ),
-                          hintText: 'Search artworks or artists',
-                          hintStyle: const TextStyle(color: Colors.grey)),
-                    )),
                 pinned: true,
+                toolbarHeight: 60,
+                titleSpacing: 16,
+                title: _SearchField(controller: _inputController, onSubmitted: _onSearch),
                 actions: <Widget>[
-                  IconButton(
-                    tooltip: 'Art quiz',
-                    icon: const Icon(Icons.quiz_outlined),
-                    onPressed: () => Navigator.push<dynamic>(
-                      context,
-                      CupertinoPageRoute<dynamic>(builder: (_) => const QuizPage()),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, right: 16),
+                    child: _QuizButton(
+                      onTap: () => Navigator.push<dynamic>(
+                        context,
+                        CupertinoPageRoute<dynamic>(builder: (_) => const QuizPage()),
+                      ),
                     ),
                   ),
                 ],
-                backgroundColor: Color(0xff141213),
               ),
-              SliverToBoxAdapter(
-                child: _DiscoverySection(arts: _masterpieces),
+              SliverToBoxAdapter(child: _DiscoverySection(arts: _masterpieces)),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _CategoryBarDelegate(selected: _selectedCategory, onSelected: _onCategorySelected),
               ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _categories.length,
-                    separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
-                    itemBuilder: (BuildContext context, int index) {
-                      final _BrowseCategory category = _categories[index];
-                      return _CategoryChip(
-                        label: category.label,
-                        selected: identical(category, _selectedCategory),
-                        onTap: () => _onCategorySelected(category),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 8)),
               AnimatedBuilder(
-                animation: combinedViewModel,
+                animation: controller,
                 builder: (BuildContext context, _) {
                   if (_loadingStatus == LoadingStatus.initial) {
                     if (controller.isLoading) {
-                      return const SliverFillRemaining(child: LoadingSpinner());
+                      return const SliverToBoxAdapter(child: SizedBox(height: 240, child: LoadingSpinner()));
                     }
                     if (controller.hasError) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          key: HomePage.errorBoxKey,
-                          child: ErrorDisplayView(
-                              message: controller.error!.message, onRetry: _onRetry),
+                      return SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 240,
+                          child: Center(
+                            key: HomePage.errorBoxKey,
+                            child: ErrorDisplayView(message: controller.error!.message, onRetry: _onRetry),
+                          ),
                         ),
                       );
                     }
@@ -224,22 +171,20 @@ class _HomePageState extends State<HomePage> {
 
                   final List<Art> items = controller.data;
                   if (items.isEmpty) {
-                    return const SliverFillRemaining(
-                      child: Center(
-                          key: HomePage.emptyStateKey,
-                          child: Text('Could not find any art works? :(')),
+                    return const SliverToBoxAdapter(
+                      child: EmptyState(
+                        key: HomePage.emptyStateKey,
+                        icon: Icons.image_search,
+                        title: 'No artworks found',
+                        message: 'Try another category or search for an artist.',
+                      ),
                     );
                   }
 
                   return SliverPadding(
-                    padding: const EdgeInsets.all(20),
+                    padding: kArtGridPadding,
                     sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: singleColumn.value ? 1 : 2,
-                        childAspectRatio: 0.8,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
+                      gridDelegate: kArtGridDelegate,
                       delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
                           final Art art = items[index];
@@ -259,10 +204,9 @@ class _HomePageState extends State<HomePage> {
                 key: HomePage.overscrollBoxKey,
                 child: AnimatedBuilder(
                   animation: controller,
-                  child: Container(color: const Color(0xff141213), height: 32),
+                  child: const SizedBox(height: 32),
                   builder: (BuildContext context, Widget? child) {
-                    if (_loadingStatus == LoadingStatus.initial ||
-                        !(controller.isLoading || controller.hasError)) {
+                    if (_loadingStatus == LoadingStatus.initial || !(controller.isLoading || controller.hasError)) {
                       return child!;
                     }
 
@@ -279,12 +223,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               )
                             : null;
-                    return SafeArea(
-                        top: false,
-                        child: Container(
-                            color: const Color(0xff141213),
-                            height: kToolbarHeight,
-                            child: Material(color: Color(0xff141213), child: child)));
+                    return SafeArea(top: false, child: SizedBox(height: kToolbarHeight, child: child));
                   },
                 ),
               ),
@@ -313,8 +252,7 @@ class _HomePageState extends State<HomePage> {
   bool _onScrollNotification(ScrollNotification notification) {
     if (Axis.vertical == notification.metrics.axis &&
         notification is ScrollUpdateNotification &&
-        notification.metrics.pixels >=
-            notification.metrics.maxScrollExtent - loadMoreThreshold) {
+        notification.metrics.pixels >= notification.metrics.maxScrollExtent - loadMoreThreshold) {
       _onLoadMoreWhenIdle();
     }
     return false;
@@ -322,6 +260,114 @@ class _HomePageState extends State<HomePage> {
 }
 
 enum LoadingStatus { idle, initial, loading }
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.onSubmitted});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 42,
+        child: TextField(
+          controller: controller,
+          textInputAction: TextInputAction.search,
+          onSubmitted: onSubmitted,
+          cursorColor: AppColors.accent,
+          style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.surfaceHigh,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 11),
+            hintText: 'Search art & artists',
+            hintStyle: const TextStyle(fontSize: 15, color: AppColors.textTertiary),
+            prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textTertiary),
+            suffixIcon: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (BuildContext context, TextEditingValue value, _) => value.text.isEmpty
+                  ? const SizedBox.shrink()
+                  : IconButton(
+                      tooltip: 'Clear',
+                      icon: const Icon(Icons.cancel, size: 18, color: AppColors.textTertiary),
+                      onPressed: controller.clear,
+                    ),
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+        ),
+      );
+}
+
+class _QuizButton extends StatelessWidget {
+  const _QuizButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Art quiz',
+        child: Material(
+          color: AppColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(12),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: const SizedBox(
+              height: 42,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(Icons.extension_outlined, size: 18, color: AppColors.accent),
+                    SizedBox(width: 6),
+                    Text('Quiz', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+class _CategoryBarDelegate extends SliverPersistentHeaderDelegate {
+  _CategoryBarDelegate({required this.selected, required this.onSelected});
+
+  final _BrowseCategory selected;
+  final ValueChanged<_BrowseCategory> onSelected;
+
+  static const double _height = 50;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) => ColoredBox(
+        color: AppColors.background,
+        child: Center(
+          child: ChipRail(
+            children: <Widget>[
+              for (final _BrowseCategory category in _categories)
+                PillChip(
+                  label: category.label,
+                  selected: identical(category, selected),
+                  onTap: () => onSelected(category),
+                ),
+            ],
+          ),
+        ),
+      );
+
+  @override
+  bool shouldRebuild(_CategoryBarDelegate oldDelegate) => !identical(oldDelegate.selected, selected);
+}
 
 class _DiscoverySection extends StatelessWidget {
   const _DiscoverySection({Key? key, required this.arts}) : super(key: key);
@@ -354,272 +400,110 @@ class _DiscoverySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        if (artworkOfDay != null) _ArtworkOfDayCard(art: artworkOfDay),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 40,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: curatedTerms.length,
-            separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
-            itemBuilder: (BuildContext context, int index) => _SearchChip(label: curatedTerms[index]),
-          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: artworkOfDay == null
+              ? Container(
+                  height: _ArtworkOfDayCard.height,
+                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(18)),
+                )
+              : _ArtworkOfDayCard(art: artworkOfDay),
+        ),
+        const SectionHeader('Featured artists'),
+        ChipRail(
+          children: <Widget>[
+            for (final String term in curatedTerms)
+              PillChip(label: term, leading: InitialsAvatar(term), onTap: () => _openSearch(context, term)),
+          ],
         ),
         if (recentlyViewed.isNotEmpty) ...<Widget>[
-          const _SectionLabel('Recently viewed'),
-          _RecentlyViewedRow(arts: recentlyViewed),
+          const SectionHeader('Recently viewed'),
+          ArtRail(arts: recentlyViewed, onTap: (Art art) => DetailsPage.go(context, art: art)),
         ],
         if (recents.isNotEmpty) ...<Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
-            child: Row(
-              children: <Widget>[
-                Text('Recent searches', style: Theme.of(context).textTheme.titleSmall),
-                const Spacer(),
-                TextButton(
-                  onPressed: store.clearRecentSearches,
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 40,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: recents.length,
-              separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
-              itemBuilder: (BuildContext context, int index) =>
-                  _SearchChip(label: recents[index], icon: Icons.history),
-            ),
+          SectionHeader('Recent searches', actionLabel: 'Clear', onAction: store.clearRecentSearches),
+          ChipRail(
+            children: <Widget>[
+              for (final String term in recents)
+                PillChip(label: term, icon: Icons.history, onTap: () => _openSearch(context, term)),
+            ],
           ),
         ],
+        const SectionHeader('Browse the collection', padding: EdgeInsets.fromLTRB(16, 24, 8, 0)),
       ],
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text, {Key? key}) : super(key: key);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-        child: Text(text, style: Theme.of(context).textTheme.titleSmall),
-      );
-}
-
 class _ArtworkOfDayCard extends StatelessWidget {
   const _ArtworkOfDayCard({Key? key, required this.art}) : super(key: key);
+
+  static const double height = 200;
 
   final Art art;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: () => DetailsPage.go(context, art: art),
-          child: SizedBox(
-            height: 180,
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                if (art.webImage?.url != null)
-                  CachedImage(url: artImageUrl(art.webImage!.url!, kGridImageSize)),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[Colors.transparent, Colors.black87],
-                      stops: <double>[0.5, 1.0],
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Material(
+          color: AppColors.surface,
+          child: InkWell(
+            onTap: () => DetailsPage.go(context, art: art),
+            child: SizedBox(
+              height: height,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  if (art.webImage?.url != null) CachedImage(url: artImageUrl(art.webImage!.url!, kGridImageSize)),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: <Color>[Colors.transparent, Color(0xe6000000)],
+                        stops: <double>[0.35, 1.0],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 12,
-                  right: 12,
-                  bottom: 12,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffD2FCAC),
-                          borderRadius: BorderRadius.circular(4),
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 14,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Row(
+                          children: <Widget>[
+                            Icon(Icons.auto_awesome, size: 12, color: AppColors.accent),
+                            SizedBox(width: 5),
+                            Text(
+                              'ARTWORK OF THE DAY',
+                              style: TextStyle(
+                                color: AppColors.accent,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          'ARTWORK OF THE DAY',
-                          style: TextStyle(
-                            color: Color(0xff141213),
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        art.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      Text(
-                        art.principalOrFirstMaker,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RecentlyViewedRow extends StatelessWidget {
-  const _RecentlyViewedRow({Key? key, required this.arts}) : super(key: key);
-
-  final List<Art> arts;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return SizedBox(
-      height: 150,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: arts.length,
-        separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
-        itemBuilder: (BuildContext context, int index) {
-          final Art art = arts[index];
-          return SizedBox(
-            width: 110,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                onTap: () => DetailsPage.go(context, art: art),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    if (art.webImage?.url != null)
-                      // Smaller than the grid's kGridImageSize: this thumbnail
-                      // only ever renders at 110 logical px wide.
-                      CachedImage(
-                        url: artImageUrl(art.webImage!.url!, 300),
-                        memCacheWidth: 300,
-                      ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        color: Colors.black38,
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-                        child: Text(
-                          art.title,
+                        const SizedBox(height: 6),
+                        Text(art.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: displayStyle(20)),
+                        const SizedBox(height: 3),
+                        Text(
+                          art.principalOrFirstMaker,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
+                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({Key? key, required this.label, required this.selected, required this.onTap})
-      : super(key: key);
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Material(
-        color: selected ? const Color(0xffD2FCAC) : Colors.white10,
-        borderRadius: BorderRadius.circular(20),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? const Color(0xff141213) : Colors.white70,
-                fontSize: 13,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ],
               ),
             ),
           ),
         ),
       );
-}
-
-class _SearchChip extends StatelessWidget {
-  const _SearchChip({Key? key, required this.label, this.icon}) : super(key: key);
-
-  final String label;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white10,
-      borderRadius: BorderRadius.circular(20),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.push<dynamic>(
-            context,
-            CupertinoPageRoute<dynamic>(
-              builder: (_) => SearchDetailPage(searchTerm: label),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (icon != null) ...<Widget>[
-                Icon(icon, size: 14, color: Colors.white54),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                label,
-                style: const TextStyle(color: Color(0xffD2FCAC), fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

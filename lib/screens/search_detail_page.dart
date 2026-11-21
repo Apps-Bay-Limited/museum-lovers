@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:museumLovers/domain/models.dart';
 import 'package:museumLovers/provider.dart';
-import 'package:museumLovers/widgets/art_grid_item.dart';
-import 'package:museumLovers/widgets/error_display_view.dart';
-import 'package:museumLovers/widgets/loading_spinner.dart';
+import 'package:museumLovers/widgets.dart';
 
 import 'data_controller.dart';
 import 'details_page.dart';
@@ -31,7 +29,7 @@ class SearchDetailPage extends StatefulWidget {
   final String? title;
   final Future<List<Art>> Function({required int page, required String term, String? type})? source;
 
-  const SearchDetailPage({Key? key, required this.searchTerm, this.title, this.source}) : super(key: key);
+  const SearchDetailPage({super.key, required this.searchTerm, this.title, this.source});
 
   @visibleForTesting
   static const Key overscrollBoxKey = Key('overscroll-box');
@@ -47,11 +45,6 @@ class SearchDetailPage extends StatefulWidget {
 class _SearchDetailPageState extends State<SearchDetailPage> {
   late final PagedSearchDataController controller =
       PagedSearchDataController(widget.source ?? context.repository.fetchSearchAll);
-
-  final ValueNotifier<bool> singleColumn = ValueNotifier<bool>(false);
-
-  late final Listenable combinedViewModel =
-      Listenable.merge(<Listenable>[controller, singleColumn]);
 
   static const double loadMoreThreshold = 300;
 
@@ -79,60 +72,37 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
   @override
   void dispose() {
     controller.dispose();
-    singleColumn.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Color(0xff141213),
         body: NotificationListener<ScrollNotification>(
           onNotification: _onScrollNotification,
           child: CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
-                title: Text(widget.title ?? widget.searchTerm),
+                title: Text(widget.title ?? widget.searchTerm, maxLines: 1, overflow: TextOverflow.ellipsis),
                 pinned: true,
-                actions: null,
-                backgroundColor: Color(0xff141213),
               ),
               if (widget.source == null)
                 SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 48,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                      itemCount: _searchTypeFilters.length,
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
-                      itemBuilder: (BuildContext context, int index) {
-                        final SearchTypeFilter filter = _searchTypeFilters[index];
-                        final bool selected = filter == _typeFilter;
-                        return Material(
-                          color: selected ? const Color(0xffD2FCAC) : Colors.white10,
-                          borderRadius: BorderRadius.circular(20),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 6),
+                    child: ChipRail(
+                      children: <Widget>[
+                        for (final SearchTypeFilter filter in _searchTypeFilters)
+                          PillChip(
+                            label: filter.label,
+                            selected: filter == _typeFilter,
                             onTap: () => _onTypeFilterSelected(filter),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              child: Text(
-                                filter.label,
-                                style: TextStyle(
-                                  color: selected ? const Color(0xff141213) : Colors.white70,
-                                  fontSize: 13,
-                                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                                ),
-                              ),
-                            ),
                           ),
-                        );
-                      },
+                      ],
                     ),
                   ),
                 ),
               AnimatedBuilder(
-                animation: combinedViewModel,
+                animation: controller,
                 builder: (BuildContext context, _) {
                   if (_loadingStatus == LoadingStatus.initial) {
                     if (controller.isLoading) {
@@ -142,8 +112,7 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
                       return SliverFillRemaining(
                         child: Center(
                           key: SearchDetailPage.errorBoxKey,
-                          child: ErrorDisplayView(
-                              message: controller.error!.message, onRetry: _onRetry),
+                          child: ErrorDisplayView(message: controller.error!.message, onRetry: _onRetry),
                         ),
                       );
                     }
@@ -151,33 +120,32 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
 
                   final List<Art> items = controller.data;
                   if (items.isEmpty) {
-                    return const SliverFillRemaining(
-                      child: Center(
-                          key: SearchDetailPage.emptyStateKey,
-                          child: Text('Could not find any art works? :(')),
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: EmptyState(
+                        key: SearchDetailPage.emptyStateKey,
+                        icon: Icons.search_off_rounded,
+                        title: 'No artworks found',
+                        message: _typeFilter.type == null
+                            ? 'Try a different spelling, or search for an artist or subject.'
+                            : 'Nothing in ${_typeFilter.label.toLowerCase()} — try “All”.',
+                      ),
                     );
                   }
 
                   return SliverPadding(
-                    padding: const EdgeInsets.all(20),
-                    sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: singleColumn.value ? 1 : 2,
-                        childAspectRatio: 0.8,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final Art art = items[index];
-                          return ArtGridItem(
-                            key: ValueKey<String>(art.id),
-                            art: art,
-                            onPressed: () => DetailsPage.go(context, art: art),
-                          );
-                        },
-                        childCount: items.length,
-                      ),
+                    padding: kArtGridPadding,
+                    sliver: SliverGrid.builder(
+                      gridDelegate: kArtGridDelegate,
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final Art art = items[index];
+                        return ArtGridItem(
+                          key: ValueKey<String>(art.id),
+                          art: art,
+                          onPressed: () => DetailsPage.go(context, art: art),
+                        );
+                      },
                     ),
                   );
                 },
@@ -186,17 +154,18 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
                 key: SearchDetailPage.overscrollBoxKey,
                 child: AnimatedBuilder(
                   animation: controller,
-                  child: Container(color: const Color(0xff141213), height: 32),
+                  child: const SizedBox(height: 32),
                   builder: (BuildContext context, Widget? child) {
-                    if (_loadingStatus == LoadingStatus.initial ||
-                        !(controller.isLoading || controller.hasError)) {
+                    if (_loadingStatus == LoadingStatus.initial || !(controller.isLoading || controller.hasError)) {
                       return child!;
                     }
-
-                    child = controller.isLoading
-                        ? const LoadingSpinner()
-                        : controller.hasError
-                            ? Padding(
+                    return SafeArea(
+                      top: false,
+                      child: SizedBox(
+                        height: kToolbarHeight,
+                        child: controller.isLoading
+                            ? const LoadingSpinner()
+                            : Padding(
                                 key: SearchDetailPage.errorBoxKey,
                                 padding: const EdgeInsets.all(8),
                                 child: ErrorDisplayView(
@@ -204,14 +173,9 @@ class _SearchDetailPageState extends State<SearchDetailPage> {
                                   onRetry: _onRetry,
                                   direction: Axis.horizontal,
                                 ),
-                              )
-                            : null;
-                    return SafeArea(
-                        top: false,
-                        child: Container(
-                            color: const Color(0xff141213),
-                            height: kToolbarHeight,
-                            child: Material(color: Color(0xff141213), child: child)));
+                              ),
+                      ),
+                    );
                   },
                 ),
               ),

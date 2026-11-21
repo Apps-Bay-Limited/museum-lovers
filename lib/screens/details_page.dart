@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,16 +7,35 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:museumLovers/constants.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
+import 'package:museumLovers/screens/favorites_page.dart';
+import 'package:museumLovers/screens/premium_page.dart';
 import 'package:museumLovers/screens/search_detail_page.dart';
+import 'package:museumLovers/theme.dart';
 import 'package:museumLovers/util/image_saver.dart';
 import 'package:museumLovers/util/image_url.dart';
 import 'package:museumLovers/util/postcard_composer.dart';
 import 'package:museumLovers/widgets.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'artist_page.dart';
 import 'data_controller.dart';
 import 'detail_full_page.dart';
+
+void _openMaker(BuildContext context, ArtMaker? maker, {required String fallbackName}) {
+  final String? id = maker?.id;
+  final String name = maker?.name ?? fallbackName;
+  if (name.isEmpty) {
+    return;
+  }
+  Navigator.push<dynamic>(
+    context,
+    CupertinoPageRoute<dynamic>(
+      builder: (BuildContext context) =>
+          id == null ? SearchDetailPage(searchTerm: name) : ArtistPage(artistId: id, artistName: name),
+    ),
+  );
+}
 
 class DetailsPage extends StatefulWidget {
   const DetailsPage({Key? key, required this.art}) : super(key: key);
@@ -26,56 +43,22 @@ class DetailsPage extends StatefulWidget {
   final Art art;
 
   static void go(BuildContext context, {required Art art}) =>
-      Navigator.of(context).push<void>(MaterialPageRoute<void>(
-          builder: (BuildContext context) => DetailsPage(art: art)));
+      Navigator.of(context).push<void>(MaterialPageRoute<void>(builder: (BuildContext context) => DetailsPage(art: art)));
 
   @visibleForTesting
   static const Key errorBoxKey = Key('error-box');
-  @visibleForTesting
-  static const Key zoomButtonKey = Key('zoom-button');
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  bool isDowloading = false;
+  bool _isSaving = false;
   bool _isSharingPostcard = false;
 
-  Future<void> _sharePostcard() async {
-    final String? url = widget.art.webImage?.url;
-    if (url == null || _isSharingPostcard) {
-      return;
-    }
-    await HapticFeedback.lightImpact();
-    setState(() => _isSharingPostcard = true);
-    try {
-      final Uint8List imageBytes =
-          await DefaultCacheManager().getSingleFile(url).then((file) => file.readAsBytes());
-      final Uint8List postcard = await PostcardComposer.compose(
-        imageBytes: imageBytes,
-        title: widget.art.title,
-        maker: widget.art.principalOrFirstMaker,
-        credit: 'via $appName',
-      );
-      await SharePlus.instance.share(
-        ShareParams(
-          files: <XFile>[XFile.fromData(postcard, name: 'artwork.png', mimeType: 'image/png')],
-          text: '${widget.art.title} — ${widget.art.principalOrFirstMaker}',
-        ),
-      );
-    } catch (_) {
-      await Fluttertoast.showToast(msg: 'Could not create the postcard. Please try again.');
-    } finally {
-      if (mounted) {
-        setState(() => _isSharingPostcard = false);
-      }
-    }
-  }
+  late final DetailDataController controller = DetailDataController(context.repository.fetch, id: widget.art.objectNumber);
 
-  late final DetailDataController controller = DetailDataController(
-      context.repository.fetch,
-      id: widget.art.objectNumber);
+  String? get _imageUrl => widget.art.webImage?.url;
 
   @override
   void initState() {
@@ -97,231 +80,315 @@ class _DetailsPageState extends State<DetailsPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff141213),
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              backgroundColor: const Color(0xff141213),
-              // title: Text(widget.art.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-              actions: <Widget>[
-                Container(
-                  width: 56,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      color: Colors.black45),
-                  child: Center(
-                    child: FavoriteButton(
-                      art: widget.art,
-                      iconSize: 25,
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Container(
-                  width: 56,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      color: Colors.black45),
-                  child: InkWell(
-                    // borderRadius: BorderRadius.circular(25),
-                    // type: MaterialType.transparency,
-                    child: IconButton(
-                        iconSize: 25,
-                        onPressed: () {
-                          final String? url = widget.art.webImage?.url;
-                          if (url != null) {
-                            Navigator.push<dynamic>(
-                              context,
-                              CupertinoPageRoute<dynamic>(
-                                builder: (BuildContext context) => Detail(
-                                  link: url,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.fullscreen_rounded)),
-                  ),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Stack(
-                  children: [
-                    Container(
-                      height: 56,
-                      width: 56,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(28),
-                          color: Colors.black45),
-                      child: InkWell(
-                        // borderRadius: BorderRadius.circular(25),
-                        // type: MaterialType.transparency,
-                        child: IconButton(
-                            tooltip: 'Save image',
-                            iconSize: 25,
-                            onPressed: () async {
-                              final String? url = widget.art.webImage?.url;
-                              if (url == null || isDowloading) {
-                                return;
-                              }
-                              await HapticFeedback.lightImpact();
-                              setState(() {
-                                isDowloading = true;
-                              });
-                              await ImageSaver.save(url);
-                              if (mounted) {
-                                setState(() {
-                                  isDowloading = false;
-                                });
-                              }
-                            },
-                            icon: const Icon(Icons.cloud_download_rounded)),
-                      ),
-                    ),
-                    if (isDowloading)
-                      const Center(
-                        child: SizedBox(
-                          height: 53,
-                          width: 53,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 4,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Stack(
-                  children: <Widget>[
-                    Container(
-                      height: 56,
-                      width: 56,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(28),
-                          color: Colors.black45),
-                      child: IconButton(
-                        tooltip: 'Share as postcard',
-                        iconSize: 25,
-                        onPressed: widget.art.webImage?.url == null ? null : _sharePostcard,
-                        icon: const Icon(Icons.ios_share_rounded),
-                      ),
-                    ),
-                    if (_isSharingPostcard)
-                      const Center(
-                        child: SizedBox(
-                          height: 53,
-                          width: 53,
-                          child: CircularProgressIndicator(strokeWidth: 4, color: Colors.white),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Container(
-                    width: 56,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(28),
-                        color: Colors.black45),
-                    child: ArtLinksButton(links: widget.art.links)),
-                const SizedBox(
-                  width: 12,
-                )
-              ],
-              pinned: true,
-              stretch: true,
-              expandedHeight: MediaQuery.of(context).size.height / 1.61,
-              flexibleSpace: FlexibleSpaceBar(
-                background: widget.art.webImage?.url != null
-                    ? InkWell(
-                        onTap: () {
-                          final String? url = widget.art.webImage?.url;
-                          if (url != null) {
-                            Navigator.push<dynamic>(
-                              context,
-                              CupertinoPageRoute<dynamic>(
-                                builder: (BuildContext context) => Detail(
-                                  link: url,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        child: Hero(
-                          tag: widget.art.webImage!.url!,
-                          child: CachedNetworkImage(
-                            key: Key(widget.art.webImage!.url!),
-                            imageUrl: widget.art.webImage!.url!,
-                            fit: BoxFit.cover,
-                            placeholder: (BuildContext context, String url) => Image(
-                              image: CachedNetworkImageProvider(
-                                  artImageUrl(widget.art.webImage!.url!, kGridImageSize)),
-                              fit: BoxFit.cover,
-                            ),
-                            errorWidget: (BuildContext context, String url, dynamic error) =>
-                                const Center(child: Icon(Icons.error)),
-                          ),
-                        ))
-                    : null,
-                stretchModes: const <StretchMode>[StretchMode.zoomBackground],
-                collapseMode: CollapseMode.parallax,
-              ),
-            ),
-            AnimatedBuilder(
-              animation: controller,
-              builder: (BuildContext context, _) {
-                if (controller.isLoading) {
-                  return const SliverFillRemaining(child: LoadingSpinner());
-                }
-                if (controller.hasError) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      key: DetailsPage.errorBoxKey,
-                      child: ErrorDisplayView(
-                          message: controller.error!.message,
-                          onRetry: controller.retry),
-                    ),
-                  );
-                }
+  void _openFullScreen() {
+    final String? url = _imageUrl;
+    if (url != null) {
+      Navigator.push<dynamic>(context, CupertinoPageRoute<dynamic>(builder: (BuildContext context) => Detail(link: url)));
+    }
+  }
 
-                final ArtDetail? data = controller.data;
-                if (data == null) {
-                  return const SliverFillRemaining(
-                      child:
-                          Center(child: Text('Could not find art work? :(')));
-                }
+  Future<void> _saveImage() async {
+    final String? url = _imageUrl;
+    if (url == null || _isSaving) {
+      return;
+    }
+    await HapticFeedback.lightImpact();
+    setState(() => _isSaving = true);
+    await ImageSaver.save(url);
+    if (mounted) {
+      setState(() => _isSaving = false);
+    }
+  }
 
-                return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 48),
-                  sliver: _DataView(key: Key(data.objectNumber), data: data),
-                );
-              },
-            ),
-          ],
+  Future<void> _sharePostcard() async {
+    final String? url = _imageUrl;
+    if (url == null || _isSharingPostcard || !await ensurePremium(context) || !mounted) {
+      return;
+    }
+    await HapticFeedback.lightImpact();
+    setState(() => _isSharingPostcard = true);
+    try {
+      final Uint8List imageBytes = await DefaultCacheManager().getSingleFile(url).then((file) => file.readAsBytes());
+      final Uint8List postcard = await PostcardComposer.compose(
+        imageBytes: imageBytes,
+        title: widget.art.title,
+        maker: widget.art.principalOrFirstMaker,
+        credit: 'via $appName',
+      );
+      await SharePlus.instance.share(
+        ShareParams(
+          files: <XFile>[XFile.fromData(postcard, name: 'artwork.png', mimeType: 'image/png')],
+          text: '${widget.art.title} — ${widget.art.principalOrFirstMaker}',
         ),
       );
+    } catch (_) {
+      await Fluttertoast.showToast(msg: 'Could not create the postcard. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isSharingPostcard = false);
+      }
+    }
+  }
+
+  Future<void> _openWebsite() async {
+    final String? url = widget.art.links.url;
+    if (url != null) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _openArtist() {
+    final List<ArtMaker> makers = controller.data?.principalMakers ?? const <ArtMaker>[];
+    _openMaker(context, makers.isEmpty ? null : makers.first, fallbackName: widget.art.principalOrFirstMaker);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String? imageUrl = _imageUrl;
+    final bool isPremium = context.appStore.isPremium;
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            pinned: true,
+            stretch: true,
+            expandedHeight: MediaQuery.sizeOf(context).height * 0.5,
+            automaticallyImplyLeading: false,
+            title: _CollapsedTitle(widget.art.title),
+            leadingWidth: 64,
+            leading: Center(
+              child: OverlayIconButton(
+                icon: Icons.arrow_back_ios_new_rounded,
+                tooltip: 'Back',
+                onPressed: () => Navigator.maybePop(context),
+              ),
+            ),
+            actions: <Widget>[
+              FavoriteButton(art: widget.art, iconSize: 20, padding: 10),
+              const SizedBox(width: 16),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const <StretchMode>[StretchMode.zoomBackground],
+              collapseMode: CollapseMode.parallax,
+              background: imageUrl == null
+                  ? const ColoredBox(color: AppColors.surface)
+                  : Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: _openFullScreen,
+                          child: Hero(
+                            tag: imageUrl,
+                            child: CachedNetworkImage(
+                              key: Key(imageUrl),
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (BuildContext context, String url) => Image(
+                                image: CachedNetworkImageProvider(artImageUrl(imageUrl, kGridImageSize)),
+                                fit: BoxFit.cover,
+                              ),
+                              errorWidget: (BuildContext context, String url, dynamic error) => const Center(
+                                  child: Icon(Icons.broken_image_outlined, color: AppColors.textTertiary)),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 16,
+                          bottom: 16,
+                          child: OverlayIconButton(
+                            icon: Icons.open_in_full_rounded,
+                            tooltip: 'View full screen',
+                            size: 36,
+                            onPressed: _openFullScreen,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(widget.art.title, style: displayStyle(25)),
+                  const SizedBox(height: 6),
+                  InkWell(
+                    onTap: _openArtist,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(Icons.brush_outlined, size: 16, color: AppColors.accent),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              widget.art.principalOrFirstMaker,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accent,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, size: 18, color: AppColors.accent),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: <Widget>[
+                      _ActionButton(
+                        icon: Icons.download_rounded,
+                        label: 'Save',
+                        busy: _isSaving,
+                        onTap: imageUrl == null ? null : _saveImage,
+                      ),
+                      const SizedBox(width: 8),
+                      _ActionButton(
+                        icon: Icons.dashboard_customize_outlined,
+                        label: 'Board',
+                        locked: !isPremium,
+                        onTap: () => showAddToBoardSheet(context, widget.art),
+                      ),
+                      const SizedBox(width: 8),
+                      _ActionButton(
+                        icon: Icons.mail_outline_rounded,
+                        label: 'Postcard',
+                        locked: !isPremium,
+                        busy: _isSharingPostcard,
+                        onTap: imageUrl == null ? null : _sharePostcard,
+                      ),
+                      if (widget.art.links.url != null) ...<Widget>[
+                        const SizedBox(width: 8),
+                        _ActionButton(icon: Icons.open_in_new_rounded, label: 'Website', onTap: _openWebsite),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: controller,
+            builder: (BuildContext context, _) {
+              if (controller.isLoading) {
+                return const SliverToBoxAdapter(child: SizedBox(height: 160, child: LoadingSpinner()));
+              }
+              if (controller.hasError) {
+                return SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 160,
+                    child: Center(
+                      key: DetailsPage.errorBoxKey,
+                      child: ErrorDisplayView(message: controller.error!.message, onRetry: controller.retry),
+                    ),
+                  ),
+                );
+              }
+              final ArtDetail? data = controller.data;
+              if (data == null) {
+                return const SliverToBoxAdapter(
+                  child: EmptyState(
+                    icon: Icons.info_outline,
+                    title: 'Details unavailable',
+                    message: 'The museum has no further information on this artwork.',
+                  ),
+                );
+              }
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+                sliver: _DataView(key: Key(data.objectNumber), data: data),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.busy = false,
+    this.locked = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final bool busy;
+  final bool locked;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = onTap == null ? AppColors.textTertiary : AppColors.textPrimary;
+    return Expanded(
+      child: Material(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: busy ? null : onTap,
+          child: SizedBox(
+            height: 64,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox.square(
+                  dimension: 24,
+                  child: busy
+                      ? const Padding(
+                          padding: EdgeInsets.all(2),
+                          child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+                        )
+                      : Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            Icon(icon, size: 23, color: color),
+                            if (locked)
+                              Positioned(
+                                right: -7,
+                                top: -5,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2.5),
+                                  decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                                  child: const Icon(Icons.lock, size: 9, color: AppColors.onAccent),
+                                ),
+                              ),
+                          ],
+                        ),
+                ),
+                const SizedBox(height: 6),
+                Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _DataView extends StatefulWidget {
-  final ArtDetail data;
-
   const _DataView({Key? key, required this.data}) : super(key: key);
 
+  final ArtDetail data;
+
   @override
-  __DataViewState createState() => __DataViewState();
+  State<_DataView> createState() => _DataViewState();
 }
 
-class __DataViewState extends State<_DataView> {
+class _DataViewState extends State<_DataView> {
   late final Future<List<Art>> _moreByArtistFuture = _loadMoreByArtist();
 
   Future<List<Art>> _loadMoreByArtist() async {
@@ -337,130 +404,88 @@ class __DataViewState extends State<_DataView> {
     }
   }
 
+  static String _formatDimensions(List<ArtDimension> dimensions) => dimensions.map((ArtDimension d) {
+        final String? type = d.type;
+        final String label = type == null || type.isEmpty ? '' : '${type[0].toUpperCase()}${type.substring(1)} ';
+        final String value = d.value == d.value.roundToDouble() ? d.value.toStringAsFixed(0) : '${d.value}';
+        final String part = d.part == null ? '' : ' (${d.part})';
+        return '$label$value ${d.unit}$part';
+      }).join('\n');
+
+  void _searchColor(ArtColor color) {
+    final String hex = '#${color.hex.replaceAll('#', '').trim().toUpperCase()}';
+    Navigator.push<dynamic>(
+      context,
+      CupertinoPageRoute<dynamic>(
+        builder: (BuildContext context) => SearchDetailPage(
+          searchTerm: hex,
+          title: 'Color $hex',
+          source: ({required int page, required String term, String? type}) =>
+              context.repository.fetchByColor(page: page, hex: term),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final TextTheme textTheme = theme.textTheme;
+    final ArtDetail data = widget.data;
+    final String description =
+        data.label.description ?? data.plaqueDescriptionEnglish ?? data.description ?? '';
+    final List<String> types = Set<String>.of(data.objectTypes + data.objectCollection).toList();
+    final List<(String, Widget)> facts = <(String, Widget)>[
+      if (data.dating.presentingDate.isNotEmpty) ('Date', _FactText(data.dating.presentingDate)),
+      if (types.isNotEmpty) ('Type', _FactText(types.join(', '))),
+      if (data.scLabelLine.isNotEmpty && data.scLabelLine != data.materials.join(', '))
+        ('Medium', _FactText(data.scLabelLine)),
+      if (data.materials.isNotEmpty) ('Materials', ArtMaterialRow(materials: data.materials)),
+      if (data.techniques.isNotEmpty) ('Technique', _FactText(data.techniques.join(', '))),
+      if (data.dimensions.isNotEmpty) ('Size', _FactText(_formatDimensions(data.dimensions))),
+      if (data.productionPlaces.isNotEmpty) ('Made in', _FactText(data.productionPlaces.join(', '))),
+      if (data.physicalProperties.isNotEmpty) ('Properties', _FactText(data.physicalProperties.join(', '))),
+      if (data.historicalPersons.isNotEmpty) ('Depicts', _FactText(data.historicalPersons.join(', '))),
+      if (data.galleryLocation != null) ('On display', _FactText(data.galleryLocation!)),
+      if (data.inscriptions.isNotEmpty) ('Inscriptions', _FactText(data.inscriptions.join('\n'))),
+      if (data.documentation.isNotEmpty) ('Sources', _FactText(data.documentation.join('\n'))),
+      if (data.normalizedColors.isNotEmpty)
+        ('Colors', ArtColorRow(colors: data.normalizedColors, onColorTap: _searchColor)),
+    ];
+    const EdgeInsets sectionPadding = EdgeInsets.fromLTRB(0, 26, 0, 10);
 
     return SliverList(
       delegate: SliverChildListDelegate(<Widget>[
-        AppSpacing.v16,
-        Text(widget.data.title, style: textTheme.headlineSmall),
-        AppSpacing.v8,
-        // if (data.physicalMedium != null) ...<Widget>[
-        //   Text(data.physicalMedium!, style: textTheme.caption?.copyWith(fontSize: 14)),
-        //   AppSpacing.v8,
-        // ],
-        Wrap(
-          spacing: 4,
-          children: <Widget>[
-            for (final String type in Set<String>.of(
-                widget.data.objectTypes + widget.data.objectCollection))
-              InkWell(
-                child: Chip(
-                    key: Key(type),
-                    label: Text(
-                      type,
-                      style: const TextStyle(color: Color(0xffD2FCAC)),
-                    ),
-                    labelStyle: textTheme.bodyLarge),
-                onTap: () {
-                  Navigator.of(context).push<void>(MaterialPageRoute<void>(
-                      builder: (BuildContext context) => SearchDetailPage(
-                            searchTerm: type,
-                          )));
-                },
-              ),
-          ],
-        ),
-        AppSpacing.v16,
-        const Divider(
-          color: Colors.white60,
-        ),
-        AppSpacing.v16,
-        InkWell(
-          onTap: () => _openMaker(context, widget.data.principalMakers.isEmpty
-              ? null
-              : widget.data.principalMakers.first),
-          child: Row(children: <Widget>[
-            const Icon(Icons.brush_rounded, size: 20),
-            AppSpacing.h4,
-            Text(widget.data.principalMaker, style: textTheme.titleLarge),
-          ]),
-        ),
-        AppSpacing.v10,
-        Text(
-          widget.data.label.description ??
-              widget.data.plaqueDescriptionEnglish ??
-              widget.data.description ??
-              'N/A',
-          style: textTheme.bodyLarge?.copyWith(height: 1.5),
-        ),
-        AppSpacing.v16,
-        Text(widget.data.scLabelLine, style: textTheme.bodySmall),
-        if (widget.data.webImage?.url != null) ...<Widget>[
-          AppSpacing.v4,
-          AspectRatio(
-            aspectRatio: widget.data.webImage!.aspectRatio,
-            child: Stack(
+        if (description.isNotEmpty) ExpandableText(description),
+        if (facts.isNotEmpty) ...<Widget>[
+          const SectionHeader('About this work', padding: sectionPadding),
+          SurfaceCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
               children: <Widget>[
-                CachedImage(
-                  url: widget.data.webImage!.url!,
-                  builder: (ImageProvider<Object> provider) =>
-                      Ink.image(image: provider, fit: BoxFit.cover),
-                ),
-                IconButton(
-                  key: DetailsPage.zoomButtonKey,
-                  onPressed: () => showDialog<void>(
-                      context: context,
-                      builder: (_) =>
-                          ImageDialog(url: widget.data.webImage!.url!)),
-                  icon: const Icon(Icons.zoom_out_map),
-                )
+                for (int i = 0; i < facts.length; i++) ...<Widget>[
+                  if (i > 0) const Divider(),
+                  _FactRow(label: facts[i].$1, child: facts[i].$2),
+                ],
               ],
             ),
           ),
-          AppSpacing.v4,
         ],
-        ArtColorRow(
-          colors: widget.data.normalizedColors,
-          onColorTap: (ArtColor color) {
-            final String hex = '#${color.hex.replaceAll('#', '').trim().toUpperCase()}';
-            Navigator.push<dynamic>(
-              context,
-              CupertinoPageRoute<dynamic>(
-                builder: (BuildContext context) => SearchDetailPage(
-                  searchTerm: hex,
-                  title: 'Color $hex',
-                  source: ({required int page, required String term, String? type}) =>
-                      context.repository.fetchByColor(page: page, hex: term),
-                ),
-              ),
-            );
-          },
-        ),
-        AppSpacing.v2,
-        ArtMaterialRow(materials: widget.data.materials),
-        AppSpacing.v16,
-        const Divider(
-          color: Colors.white60,
-        ),
-        AppSpacing.v16,
-        if (widget.data.dimensions.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Dimensions'),
-          AppSpacing.v8,
-          for (final ArtDimension dimension in widget.data.dimensions)
-            ArtDimensionItem(
-                key: Key(dimension.toString()), dimension: dimension),
-          AppSpacing.v12,
+        if (data.principalMakers.isNotEmpty) ...<Widget>[
+          SectionHeader(data.principalMakers.length > 1 ? 'Artists' : 'Artist', padding: sectionPadding),
+          SurfaceCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+            child: Column(
+              children: <Widget>[
+                for (int i = 0; i < data.principalMakers.length; i++) ...<Widget>[
+                  if (i > 0) const Divider(),
+                  InkWell(
+                    onTap: () => _openMaker(context, data.principalMakers[i], fallbackName: data.principalMaker),
+                    child: ArtMakerItem(key: Key(data.principalMakers[i].name), maker: data.principalMakers[i]),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
-        const _SectionHeaderText('Principal makers'),
-        AppSpacing.v8,
-        for (final ArtMaker maker in widget.data.principalMakers)
-          InkWell(
-              onTap: () => _openMaker(context, maker),
-              child: ArtMakerItem(key: Key(maker.name), maker: maker)),
-        AppSpacing.v12,
         FutureBuilder<List<Art>>(
           future: _moreByArtistFuture,
           builder: (BuildContext context, AsyncSnapshot<List<Art>> snapshot) {
@@ -468,156 +493,73 @@ class __DataViewState extends State<_DataView> {
             if (works.isEmpty) {
               return const SizedBox.shrink();
             }
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _SectionHeaderText('More by ${widget.data.principalOrFirstMaker}'),
-                  AppSpacing.v8,
-                  SizedBox(
-                    height: 150,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: works.length,
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 12),
-                      itemBuilder: (BuildContext context, int index) {
-                        final Art art = works[index];
-                        return SizedBox(
-                          width: 110,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: InkWell(
-                              onTap: () => Navigator.of(context).push<void>(
-                                  MaterialPageRoute<void>(builder: (BuildContext context) => DetailsPage(art: art))),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: <Widget>[
-                                  if (art.webImage?.url != null)
-                                    CachedImage(url: artImageUrl(art.webImage!.url!, 300), memCacheWidth: 300),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: Container(
-                                      color: Colors.black38,
-                                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-                                      child: Text(
-                                        art.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: textTheme.bodySmall,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SectionHeader('More by ${data.principalOrFirstMaker}', padding: sectionPadding),
+                ArtRail(
+                  arts: works,
+                  padding: EdgeInsets.zero,
+                  onTap: (Art art) => DetailsPage.go(context, art: art),
+                ),
+              ],
             );
           },
         ),
-        if (widget.data.productionPlaces.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Production places'),
-          AppSpacing.v8,
-          Text(widget.data.productionPlaces.join(', '),
-              style: textTheme.bodyMedium),
-          AppSpacing.v12,
-        ],
-        if (widget.data.techniques.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Techniques'),
-          AppSpacing.v8,
-          Text(widget.data.techniques.join(', '), style: textTheme.bodyMedium),
-          AppSpacing.v12,
-        ],
-        if (widget.data.physicalProperties.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Physical properties'),
-          AppSpacing.v8,
-          Text(widget.data.physicalProperties.join(', '),
-              style: textTheme.bodyMedium),
-          AppSpacing.v12,
-        ],
-        if (widget.data.historicalPersons.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Historical persons'),
-          AppSpacing.v8,
-          Text(widget.data.historicalPersons.join(', '),
-              style: textTheme.bodyMedium),
-          AppSpacing.v12,
-        ],
-        if (widget.data.inscriptions.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Inscriptions'),
-          AppSpacing.v8,
-          Text('— ' + widget.data.inscriptions.join('\n— '),
-              style: textTheme.bodyMedium?.copyWith(height: 1.25)),
-          AppSpacing.v12,
-        ],
-        if (widget.data.galleryLocation != null) ...<Widget>[
-          const _SectionHeaderText('On display'),
-          AppSpacing.v8,
-          Row(children: <Widget>[
-            const Icon(Icons.location_on_outlined, size: 18),
-            AppSpacing.h4,
-            Expanded(child: Text(widget.data.galleryLocation!, style: textTheme.bodyMedium)),
-          ]),
-          AppSpacing.v12,
-        ],
-        if (widget.data.documentation.isNotEmpty) ...<Widget>[
-          const _SectionHeaderText('Documentation'),
-          AppSpacing.v8,
-          Text('— ' + widget.data.documentation.join('\n— '),
-              style: textTheme.bodyMedium?.copyWith(height: 1.25)),
-          AppSpacing.v12,
-        ],
-        AppSpacing.v24,
       ]),
-    );
-  }
-
-  void _openMaker(BuildContext context, ArtMaker? maker) {
-    if (maker == null) {
-      return;
-    }
-    final String? id = maker.id;
-    Navigator.push<dynamic>(
-      context,
-      CupertinoPageRoute<dynamic>(
-        builder: (BuildContext context) => id == null
-            ? SearchDetailPage(searchTerm: maker.name)
-            : ArtistPage(artistId: id, artistName: maker.name),
-      ),
     );
   }
 }
 
-class _SectionHeaderText extends StatelessWidget {
-  const _SectionHeaderText(this.data, {Key? key}) : super(key: key);
+class _FactRow extends StatelessWidget {
+  const _FactRow({required this.label, required this.child});
 
-  final String data;
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              width: 96,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textTertiary)),
+              ),
+            ),
+            Expanded(child: child),
+          ],
+        ),
+      );
+}
+
+class _FactText extends StatelessWidget {
+  const _FactText(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Text(text, style: const TextStyle(fontSize: 14, height: 1.4));
+}
+
+/// App-bar title that only fades in once the hero image has collapsed.
+class _CollapsedTitle extends StatelessWidget {
+  const _CollapsedTitle(this.title);
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-      child: Text(
-        data,
-        style: textTheme.titleLarge?.copyWith(
-          letterSpacing: .85,
-          height: 1.5,
-          // decoration: TextDecoration.underline,
-          // decorationStyle: TextDecorationStyle.double,
-          fontStyle: FontStyle.italic,
-          decorationColor: textTheme.bodySmall?.color,
-          color: Colors.white,
-        ),
-        key: Key(data),
-      ),
+    final FlexibleSpaceBarSettings? settings = context.dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
+    final double collapse = settings == null
+        ? 1
+        : 1 - ((settings.currentExtent - settings.minExtent) / 48).clamp(0.0, 1.0);
+    return Opacity(
+      opacity: collapse,
+      child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: displayStyle(17)),
     );
   }
 }
