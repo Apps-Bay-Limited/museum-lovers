@@ -21,14 +21,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff141213),
         body: IndexedStack(
           index: _currentIndex,
           children: _pages,
         ),
         bottomNavigationBar: NavigationBar(
-          backgroundColor: const Color(0xff141213),
-          indicatorColor: Colors.white24,
           selectedIndex: _currentIndex,
           onDestinationSelected: (int index) => setState(() => _currentIndex = index),
           destinations: const <NavigationDestination>[
@@ -40,7 +37,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             NavigationDestination(
               icon: Icon(Icons.favorite_outline),
               selectedIcon: Icon(Icons.favorite),
-              label: 'Favorites',
+              label: 'Collection',
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_outlined),

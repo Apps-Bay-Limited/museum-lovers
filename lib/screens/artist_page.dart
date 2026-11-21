@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:museumLovers/constants.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/provider.dart';
+import 'package:museumLovers/theme.dart';
 import 'package:museumLovers/widgets.dart';
 
 import 'data_controller.dart';
@@ -10,7 +10,7 @@ import 'details_page.dart';
 /// Full artist biography, resolved from the Rijksmuseum Person record, with
 /// a grid of the artist's other works below.
 class ArtistPage extends StatefulWidget {
-  const ArtistPage({Key? key, required this.artistId, required this.artistName}) : super(key: key);
+  const ArtistPage({super.key, required this.artistId, required this.artistName});
 
   final String artistId;
   final String artistName;
@@ -24,8 +24,6 @@ class _ArtistPageState extends State<ArtistPage> {
 
   late final PagedSearchDataController _worksController =
       PagedSearchDataController(context.repository.fetchSearchAll);
-
-  final ValueNotifier<bool> _singleColumn = ValueNotifier<bool>(false);
 
   static const double _loadMoreThreshold = 300;
   _LoadingStatus _loadingStatus = _LoadingStatus.initial;
@@ -43,7 +41,6 @@ class _ArtistPageState extends State<ArtistPage> {
   @override
   void dispose() {
     _worksController.dispose();
-    _singleColumn.dispose();
     super.dispose();
   }
 
@@ -65,80 +62,70 @@ class _ArtistPageState extends State<ArtistPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff141213),
         body: NotificationListener<ScrollNotification>(
           onNotification: _onScrollNotification,
           child: CustomScrollView(
             slivers: <Widget>[
-              SliverAppBar(
-                backgroundColor: const Color(0xff141213),
-                title: Text(widget.artistName, maxLines: 1, overflow: TextOverflow.ellipsis),
-                pinned: true,
-              ),
+              const SliverAppBar(pinned: true),
               SliverToBoxAdapter(
                 child: FutureBuilder<ArtMaker>(
                   future: _artistFuture,
                   builder: (BuildContext context, AsyncSnapshot<ArtMaker> snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
-                      return const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: LoadingSpinner(),
-                      );
+                      return const SizedBox(height: 140, child: LoadingSpinner());
                     }
                     if (snapshot.hasError || !snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Center(child: Text('Could not load this artist :(')),
+                      return _ArtistHeader(
+                        artist: ArtMaker(
+                          id: widget.artistId,
+                          name: widget.artistName,
+                          unFixedName: widget.artistName,
+                          occupation: const <String>[],
+                          roles: const <String>[],
+                          labelDesc: '',
+                        ),
+                        fallbackName: widget.artistName,
                       );
                     }
                     return _ArtistHeader(artist: snapshot.data!, fallbackName: widget.artistName);
                   },
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
-                  child: Divider(color: Colors.white24),
-                ),
-              ),
               AnimatedBuilder(
                 animation: _worksController,
                 builder: (BuildContext context, _) {
                   if (_loadingStatus == _LoadingStatus.initial && _worksController.isLoading) {
-                    return const SliverToBoxAdapter(
-                      child: Padding(padding: EdgeInsets.all(24), child: LoadingSpinner()),
-                    );
+                    return const SliverToBoxAdapter(child: SizedBox(height: 160, child: LoadingSpinner()));
                   }
                   final List<Art> works = _worksController.data;
                   if (works.isEmpty) {
                     return const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Center(child: Text('No other works found')),
+                      child: EmptyState(
+                        icon: Icons.image_search_rounded,
+                        title: 'No works found',
+                        message: 'The collection has no other works listed under this name.',
                       ),
                     );
                   }
-                  return SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                    sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.8,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
+                  return SliverMainAxisGroup(
+                    slivers: <Widget>[
+                      const SliverToBoxAdapter(child: SectionHeader('Works in the collection')),
+                      SliverPadding(
+                        padding: kArtGridPadding.copyWith(top: 0),
+                        sliver: SliverGrid.builder(
+                          gridDelegate: kArtGridDelegate,
+                          itemCount: works.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final Art art = works[index];
+                            return ArtGridItem(
+                              key: ValueKey<String>(art.id),
+                              art: art,
+                              onPressed: () => DetailsPage.go(context, art: art),
+                            );
+                          },
+                        ),
                       ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final Art art = works[index];
-                          return ArtGridItem(
-                            key: ValueKey<String>(art.id),
-                            art: art,
-                            onPressed: () => DetailsPage.go(context, art: art),
-                          );
-                        },
-                        childCount: works.length,
-                      ),
-                    ),
+                    ],
                   );
                 },
               ),
@@ -151,7 +138,7 @@ class _ArtistPageState extends State<ArtistPage> {
 enum _LoadingStatus { idle, initial, loading }
 
 class _ArtistHeader extends StatelessWidget {
-  const _ArtistHeader({Key? key, required this.artist, required this.fallbackName}) : super(key: key);
+  const _ArtistHeader({required this.artist, required this.fallbackName});
 
   final ArtMaker artist;
   final String fallbackName;
@@ -167,56 +154,58 @@ class _ArtistHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final String displayName = fallbackName.isNotEmpty ? fallbackName : artist.name;
+    final String meta = <String?>[_lifespan, artist.placeOfBirth].whereType<String>().join(' · ');
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             children: <Widget>[
-              CircleAvatar(radius: 32, child: Text(artist.initials)),
-              AppSpacing.h4,
-              const SizedBox(width: 8),
+              InitialsAvatar(displayName, size: 64),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(displayName, style: theme.textTheme.titleLarge),
-                    if (_lifespan != null || artist.placeOfBirth != null) ...<Widget>[
-                      AppSpacing.v2,
-                      Text(
-                        <String?>[_lifespan, artist.placeOfBirth].whereType<String>().join(' · '),
-                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.white60),
-                      ),
+                    Text(displayName, style: displayStyle(24)),
+                    if (meta.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 4),
+                      Text(meta, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
                     ],
                   ],
                 ),
               ),
-              FavoriteArtistButton(artist: artist),
+              if (artist.id != null) FavoriteArtistButton(artist: artist),
             ],
           ),
           if (artist.occupation.isNotEmpty) ...<Widget>[
-            AppSpacing.v12,
+            const SizedBox(height: 14),
             Wrap(
               spacing: 6,
               runSpacing: 6,
               children: <Widget>[
-                for (final String occupation in artist.occupation)
-                  Chip(
-                    label: Text(occupation, style: const TextStyle(color: Color(0xffD2FCAC))),
-                    backgroundColor: Colors.white10,
-                    side: BorderSide.none,
+                for (final String occupation in artist.occupation.toSet())
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: ShapeDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.12),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Text(
+                      occupation,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.accent),
+                    ),
                   ),
               ],
             ),
           ],
           if (artist.biography != null && artist.biography!.isNotEmpty) ...<Widget>[
-            AppSpacing.v16,
-            Text(artist.biography!, style: theme.textTheme.bodyMedium?.copyWith(height: 1.5)),
+            const SizedBox(height: 16),
+            ExpandableText(artist.biography!),
           ],
         ],
       ),

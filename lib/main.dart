@@ -9,6 +9,7 @@ import 'package:museumLovers/store/app_store.dart';
 import 'package:museumLovers/util/ads_manager.dart';
 import 'package:museumLovers/util/consent_manager.dart';
 import 'package:museumLovers/util/in_app_reviewer_helper.dart';
+import 'package:museumLovers/util/premium_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
@@ -37,8 +38,12 @@ void main() async {
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  final AppStore store = AppStore(prefs);
+  final PremiumService premium = PremiumService(store);
+  unawaited(premium.init());
   runApp(App(
     repository: HttpRijksRepository(Client(), apiKey: AppConfig.rijksmuseumApiKey),
-    store: AppStore(prefs),
+    store: store,
+    premium: premium,
   ));
 }

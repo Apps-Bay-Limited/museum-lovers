@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:clock/clock.dart';
 import 'package:http/http.dart';
+import 'package:museumLovers/cache.dart';
 import 'package:museumLovers/domain.dart';
 import 'package:museumLovers/util/image_url.dart';
 
@@ -35,10 +36,13 @@ class HttpRijksRepository implements RijksRepository {
   // AAT language ids used to pick English strings out of multilingual arrays.
   static const String _aatEnglish = 'http://vocab.getty.edu/aat/300388277';
 
-  final Map<String, ArtDetail> _detailCache = <String, ArtDetail>{};
-  final Map<String, Art> _artCache = <String, Art>{};
-  final Map<String, String?> _imageCache = <String, String?>{};
-  final Map<String, _SearchCursor> _cursors = <String, _SearchCursor>{};
+  // Bounded (LRU-ish) rather than plain Maps: a long browsing session can
+  // resolve thousands of distinct objects, and these would otherwise grow
+  // for the lifetime of the app.
+  final InMemoryCache<String, ArtDetail> _detailCache = InMemoryCache<String, ArtDetail>(150);
+  final InMemoryCache<String, Art> _artCache = InMemoryCache<String, Art>(400);
+  final InMemoryCache<String, String?> _imageCache = InMemoryCache<String, String?>(400);
+  final InMemoryCache<String, _SearchCursor> _cursors = InMemoryCache<String, _SearchCursor>(40);
 
   Map<String, String> get _headers => <String, String>{
         'Accept': 'application/ld+json',
@@ -47,13 +51,13 @@ class HttpRijksRepository implements RijksRepository {
 
   @override
   Future<ArtDetail> fetch(String objectNumber) async {
-    final ArtDetail? cached = _detailCache[objectNumber];
+    final ArtDetail? cached = _detailCache.get(objectNumber);
     if (cached != null) {
       return cached;
     }
     final Map<String, dynamic> obj = await _getObject(objectNumber);
     final ArtDetail detail = await _artDetailFromObject(objectNumber, obj);
-    return _detailCache[objectNumber] = detail;
+    return _detailCache.set(objectNumber, detail);
   }
 
   // The app's paging controllers (PagedDataController / PagedSearchDataController)
@@ -79,11 +83,15 @@ class HttpRijksRepository implements RijksRepository {
   }
 
   @override
-  Future<List<Art>> fetchSearchAll({required String term, required int page}) async {
-    final _SearchCursor cursor = _cursorFor('search:$term', _buildSearchUrl(<String, String>{'creator': term}));
+  Future<List<Art>> fetchSearchAll({required String term, required int page, String? type}) async {
+    final String cursorKey = 'search:$term:${type ?? ''}';
+    final _SearchCursor cursor = _cursorFor(
+      cursorKey,
+      _buildSearchUrl(<String, String>{'creator': term, if (type != null) 'type': type}),
+    );
     if (page <= _firstPage) {
       final String mode = await _pickSearchMode(term);
-      _restart(cursor, _buildSearchUrl(<String, String>{mode: term}));
+      _restart(cursor, _buildSearchUrl(<String, String>{mode: term, if (type != null) 'type': type}));
     }
     return _resolvePage(cursor, page);
   }
@@ -113,7 +121,7 @@ class HttpRijksRepository implements RijksRepository {
   // ---------------------------------------------------------------------------
 
   _SearchCursor _cursorFor(String key, String initialUrl) =>
-      _cursors[key] ??= _SearchCursor(initialUrl);
+      _cursors.get(key) ?? _cursors.set(key, _SearchCursor(initialUrl));
 
   void _restart(_SearchCursor cursor, String url) {
     cursor.ids.clear();
@@ -178,7 +186,7 @@ class HttpRijksRepository implements RijksRepository {
   // ---------------------------------------------------------------------------
 
   Future<Art?> _resolveArt(String localId) async {
-    final Art? cached = _artCache[localId];
+    final Art? cached = _artCache.get(localId);
     if (cached != null) {
       return cached;
     }
@@ -198,7 +206,7 @@ class HttpRijksRepository implements RijksRepository {
         headerImage: image,
         links: ArtLinks(web: _webPage(obj) ?? '$idBase/$localId'),
       );
-      return _artCache[localId] = art;
+      return _artCache.set(localId, art);
     } catch (_) {
       return null;
     }
@@ -212,8 +220,8 @@ class HttpRijksRepository implements RijksRepository {
   /// Object → VisualItem → DigitalObject → IIIF url. Returns a stored url at
   /// [imageWidth]; null when the object has no image.
   Future<String?> _resolveImage(String localId, Map<String, dynamic> obj) async {
-    if (_imageCache.containsKey(localId)) {
-      return _imageCache[localId];
+    if (_imageCache.contains(localId)) {
+      return _imageCache.get(localId);
     }
     String? result;
     try {
@@ -232,7 +240,7 @@ class HttpRijksRepository implements RijksRepository {
     } catch (_) {
       result = null;
     }
-    return _imageCache[localId] = result;
+    return _imageCache.set(localId, result);
   }
 
   // ---------------------------------------------------------------------------
@@ -321,18 +329,18 @@ class HttpRijksRepository implements RijksRepository {
   // Object → ArtMaker (artist page)
   // ---------------------------------------------------------------------------
 
-  final Map<String, ArtMaker> _artistCache = <String, ArtMaker>{};
+  final InMemoryCache<String, ArtMaker> _artistCache = InMemoryCache<String, ArtMaker>(100);
 
   @override
   Future<ArtMaker> fetchArtist(String id) async {
     final String localId = _localId(id);
-    final ArtMaker? cached = _artistCache[localId];
+    final ArtMaker? cached = _artistCache.get(localId);
     if (cached != null) {
       return cached;
     }
     final Map<String, dynamic> person = await _getObject(localId);
     final ArtMaker artist = await _artistFromPerson(localId, person);
-    return _artistCache[localId] = artist;
+    return _artistCache.set(localId, artist);
   }
 
   Future<ArtMaker> _artistFromPerson(String localId, Map<String, dynamic> person) async {
@@ -867,7 +875,7 @@ class DummyRijksRepository implements RijksRepository {
   }
 
   @override
-  Future<List<Art>> fetchSearchAll({required int page, required String term}) {
+  Future<List<Art>> fetchSearchAll({required int page, required String term, String? type}) {
     // TODO: implement fetchSearchAll
     throw UnimplementedError();
   }

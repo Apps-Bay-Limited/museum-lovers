@@ -8,7 +8,9 @@ abstract class RijksRepository {
   /// Top 1000 set is browsed instead.
   Future<List<Art>> fetchAll({required int page, String type = 'painting', bool masterpieces = false});
 
-  Future<List<Art>> fetchSearchAll({required int page, required String term});
+  /// [type] optionally narrows the search to one category (e.g. `painting`),
+  /// combined with [term] rather than replacing it.
+  Future<List<Art>> fetchSearchAll({required int page, required String term, String? type});
 
   Future<List<Art>> fetchByColor({required String hex, required int page});
 

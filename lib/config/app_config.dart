@@ -27,6 +27,21 @@ class AppConfig {
     throw UnsupportedError('Unsupported platform');
   }
 
+  static String get rewardedAdUnitId {
+    if (kDebugMode) {
+      if (Platform.isAndroid) return 'ca-app-pub-3940256099942544/5224354917';
+      if (Platform.isIOS) return 'ca-app-pub-3940256099942544/1712485313';
+    }
+    if (Platform.isAndroid) return Secrets.rewardedAdUnitIDAndroid;
+    if (Platform.isIOS) return Secrets.rewardedAdUnitIDIOS;
+    throw UnsupportedError('Unsupported platform');
+  }
+
+  /// The one-time "Premium" unlock. Store-side ids differ only because the
+  /// iOS bundle id and Android package name differ.
+  static String get premiumProductId =>
+      Platform.isIOS ? 'com.appsbay.museumLovers.premium' : 'com.appsbay.museum_lovers.premium';
+
   static String get rijksmuseumApiKey => Secrets.rijksmuseumApiKey;
 
   static String get museumLoversAppStoreId => Secrets.museumLoversAppStoreId;
